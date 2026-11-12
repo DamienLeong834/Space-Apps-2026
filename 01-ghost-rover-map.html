@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghost Map — Echoes Left Behind</title>
+<style>
+  :root{
+    --bg:#05070d; --ink:#e8eefc; --muted:#8ea0c4;
+    --accent:#5be7ff; --accent2:#ffb454;
+    --line:rgba(140,170,220,.22);
+    --panel:rgba(10,16,30,.92);
+    --body-hue:200;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    overflow-x:hidden;
+  }
+  a{color:var(--accent)}
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky; top:0; z-index:60;
+    padding:18px 26px 14px;
+    background:linear-gradient(180deg,rgba(5,7,13,.98),rgba(5,7,13,.86));
+    border-bottom:1px solid var(--line);
+    backdrop-filter:blur(8px);
+  }
+  .kicker{
+    font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:6px;
+  }
+  h1{font-size:clamp(22px,3.4vw,38px); font-weight:800; letter-spacing:-.5px; line-height:1.05}
+  h1 span{color:var(--accent2)}
+  .sub{color:var(--muted); font-size:14px; margin-top:7px; max-width:74ch; line-height:1.5}
+
+  .switcher{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap}
+  .switcher button{
+    font:inherit; font-size:13px; font-weight:600;
+    color:var(--muted); background:rgba(255,255,255,.04);
+    border:1px solid var(--line); border-radius:999px;
+    padding:8px 18px; cursor:pointer; transition:.18s;
+  }
+  .switcher button:hover{color:var(--ink); border-color:var(--accent); transform:translateY(-1px)}
+  .switcher button.on{
+    color:#04121a; background:var(--accent); border-color:var(--accent);
+    box-shadow:0 0 22px rgba(91,231,255,.42);
+  }
+
+  /* ---------- STAGE ---------- */
+  .stage{
+    position:relative;
+    min-height:64vh;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+    transition:background .5s;
+  }
+  .stars{
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(1.4px 1.4px at 20% 30%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 70% 18%,#cfe4ff,transparent),
+      radial-gradient(1.6px 1.6px at 45% 66%,#fff,transparent),
+      radial-gradient(1.1px 1.1px at 85% 54%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 12% 78%,#dbe9ff,transparent),
+      radial-gradient(1.1px 1.1px at 60% 88%,#fff,transparent),
+      radial-gradient(1.4px 1.4px at 33% 12%,#fff,transparent),
+      radial-gradient(1.1px 1.1px at 92% 82%,#cfe4ff,transparent);
+    opacity:.75; animation:drift 90s linear infinite;
+  }
+  @keyframes drift{to{background-position:60px 40px,-40px 60px,80px -60px,-70px -30px,50px 70px,-60px -50px,30px 90px,-90px 20px}}
+
+  .terrain{position:absolute; left:0; right:0; bottom:0; height:58%; width:100%}
+  .terrain svg{width:100%; height:100%; display:block}
+
+  .glow{
+    position:absolute; width:52vw; height:52vw; left:50%; top:34%;
+    transform:translate(-50%,-50%); border-radius:50%;
+    filter:blur(70px); opacity:.30; pointer-events:none;
+    transition:background .5s;
+  }
+
+  /* ---------- HOTSPOTS ---------- */
+  .hotspot{
+    position:absolute; z-index:20;
+    transform:translate(-50%,-50%);
+    background:none; border:0; cursor:pointer; font:inherit;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:6px; color:var(--ink);
+  }
+  .dot{
+    width:15px; height:15px; border-radius:50%;
+    background:var(--accent2); position:relative;
+    box-shadow:0 0 0 3px rgba(255,180,84,.25), 0 0 18px var(--accent2);
+    transition:.2s;
+  }
+  .dot::after{
+    content:""; position:absolute; inset:-6px; border-radius:50%;
+    border:1.5px solid var(--accent2); opacity:.7;
+    animation:ping 2.4s ease-out infinite;
+  }
+  @keyframes ping{0%{transform:scale(.6);opacity:.85} 100%{transform:scale(2.4);opacity:0}}
+  .hotspot:hover .dot,.hotspot:focus-visible .dot{transform:scale(1.5); background:var(--accent); box-shadow:0 0 0 4px rgba(91,231,255,.3),0 0 26px var(--accent)}
+  .hotspot:hover .dot::after,.hotspot:focus-visible .dot::after{border-color:var(--accent)}
+  .hotspot:focus-visible{outline:2px solid var(--accent); outline-offset:4px; border-radius:12px}
+  .tag{
+    font-size:11px; font-weight:700; letter-spacing:.06em;
+    white-space:nowrap; padding:3px 9px; border-radius:5px;
+    background:rgba(4,10,20,.82); border:1px solid var(--line);
+    color:var(--ink); transition:.2s;
+  }
+  .hotspot:hover .tag{border-color:var(--accent); color:var(--accent); transform:translateY(-2px)}
+  .hotspot.live .dot{background:#63f7a5; box-shadow:0 0 0 3px rgba(99,247,165,.25),0 0 18px #63f7a5}
+  .hotspot.live .dot::after{border-color:#63f7a5}
+  .hotspot.live .tag{color:#63f7a5}
+
+  /* ---------- LEGEND ---------- */
+  .legend{
+    position:absolute; left:22px; bottom:20px; z-index:25;
+    display:flex; gap:16px; flex-wrap:wrap;
+    font-size:11.5px; color:var(--muted);
+    background:rgba(4,10,20,.72); border:1px solid var(--line);
+    padding:9px 14px; border-radius:9px; backdrop-filter:blur(6px);
+  }
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .legend .a{background:var(--accent2)} .legend .b{background:#63f7a5}
+
+  .hint{
+    position:absolute; right:22px; bottom:20px; z-index:25;
+    font-size:11.5px; color:var(--muted);
+    background:rgba(4,10,20,.72); border:1px solid var(--line);
+    padding:9px 14px; border-radius:9px; backdrop-filter:blur(6px);
+  }
+
+  /* ---------- STORY DRAWER ---------- */
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(460px,94vw);
+    z-index:90; background:var(--panel);
+    border-left:1px solid var(--accent);
+    box-shadow:-30px 0 70px rgba(0,0,0,.6);
+    transform:translateX(102%); transition:transform .38s cubic-bezier(.2,.9,.25,1);
+    display:flex; flex-direction:column; backdrop-filter:blur(14px);
+  }
+  .drawer.open{transform:none}
+  .drawer .top{
+    padding:22px 26px 16px; border-bottom:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:flex-start; gap:14px;
+  }
+  .drawer .body{padding:22px 26px 40px; overflow-y:auto; line-height:1.65; font-size:14.5px}
+  .x{
+    background:none;border:1px solid var(--line);color:var(--muted);
+    width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:17px;flex:none;
+  }
+  .x:hover{color:var(--ink);border-color:var(--accent)}
+  .badge{
+    display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.16em;
+    text-transform:uppercase; padding:4px 10px; border-radius:4px; margin-bottom:10px;
+    background:var(--accent2); color:#1a1000;
+  }
+  .badge.live{background:#63f7a5; color:#00331b}
+  .badge.gone{background:#4a5878; color:#dbe6ff}
+  .drawer h2{font-size:25px; font-weight:800; line-height:1.15; letter-spacing:-.4px}
+  .where{color:var(--accent); font-size:13px; margin-top:7px; font-weight:600}
+  .facts{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    margin:20px 0; padding:16px; border:1px solid var(--line);
+    border-radius:11px; background:rgba(91,231,255,.05);
+  }
+  .facts div{text-align:center}
+  .facts b{display:block; font-size:19px; color:var(--accent); font-weight:800}
+  .facts span{font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em}
+  .drawer h3{
+    font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--accent2); margin:24px 0 9px;
+  }
+  .drawer p{color:#c4d2ee; margin-bottom:12px}
+  .science{
+    border-left:3px solid var(--accent2); padding:12px 16px;
+    background:rgba(255,180,84,.07); border-radius:0 9px 9px 0;
+    font-size:14px; color:#ffe0b8;
+  }
+  .still{
+    margin-top:18px; padding:13px 16px; border-radius:10px;
+    background:rgba(99,247,165,.08); border:1px solid rgba(99,247,165,.35);
+    font-size:13.5px; color:#b6f5d4;
+  }
+  .scrim{
+    position:fixed; inset:0; background:rgba(2,4,9,.6); z-index:85;
+    opacity:0; pointer-events:none; transition:.3s;
+  }
+  .scrim.on{opacity:1; pointer-events:auto}
+
+  /* ---------- STORY STRIP ---------- */
+  .strip{padding:34px 26px 60px; max-width:1180px; margin:0 auto}
+  .strip h2{font-size:22px; margin-bottom:6px}
+  .strip .lede{color:var(--muted); margin-bottom:24px; font-size:14.5px; line-height:1.6; max-width:78ch}
+  .cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:15px}
+  .card{
+    border:1px solid var(--line); border-radius:13px; padding:18px;
+    background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+    cursor:pointer; transition:.22s; text-align:left; font:inherit; color:inherit;
+  }
+  .card:hover{border-color:var(--accent); transform:translateY(-4px); box-shadow:0 14px 34px rgba(0,0,0,.45)}
+  .card .yr{font-size:11px; letter-spacing:.16em; color:var(--accent); font-weight:700}
+  .card h4{margin:8px 0 8px; font-size:16px; line-height:1.3}
+  .card p{font-size:13px; color:var(--muted); line-height:1.55}
+  .card .st{
+    display:inline-block; margin-top:12px; font-size:10px; font-weight:800;
+    letter-spacing:.14em; text-transform:uppercase; padding:3px 8px; border-radius:4px;
+    background:rgba(255,180,84,.16); color:var(--accent2);
+  }
+  .card .st.live{background:rgba(99,247,165,.15); color:#63f7a5}
+  footer{
+    border-top:1px solid var(--line); padding:20px 26px;
+    font-size:12px; color:var(--muted); text-align:center;
+  }
+  @media(max-width:640px){
+    .legend,.hint{display:none}
+    .facts{grid-template-columns:1fr}
+    .hotspot .tag{font-size:10px}
+  }
+</style>
+<link rel="stylesheet" href="kid-mode.css">
+<script src="kid-mode.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="kicker">2026 NASA Space Apps · Ghost Map</div>
+  <h1>Abandoned but not Forgotten: <span>Echoes Left Behind</span></h1>
+  <p class="sub">Since the 1960s, NASA has left hardware across the solar system. Tap a beacon to hear the story of the machine that made the science — and what it discovered.</p>
+  <div class="switcher" id="switcher">
+    <button data-body="moon" class="on">🌙 The Moon</button>
+    <button data-body="mars">🔴 Mars</button>
+    <button data-body="deep">🪐 Deep Space</button>
+  </div>
+</header>
+
+<div class="stage" id="stage">
+  <div class="stars"></div>
+  <div class="glow" id="glow"></div>
+  <div class="terrain" id="terrain"></div>
+  <div id="spots"></div>
+  <div class="legend">
+    <span><i class="a"></i>Abandoned hardware</span>
+    <span><i class="b"></i>Still returning science</span>
+  </div>
+  <div class="hint">Click any beacon · or use the story cards below</div>
+</div>
+
+<section class="strip">
+  <h2>The full story list</h2>
+  <p class="lede">Every card is a real piece of hardware. Click one to open its story panel — the same detail you'd get from the map.</p>
+  <div class="cards" id="cards"></div>
+</section>
+
+<footer>Story data compiled from NASA mission records · Educational prototype — verify figures before submission</footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <div class="top">
+    <div>
+      <span class="badge" id="dBadge">Abandoned</span>
+      <h2 id="dTitle">—</h2>
+      <div class="where" id="dWhere">—</div>
+    </div>
+    <button class="x" id="dClose" aria-label="Close">✕</button>
+  </div>
+ <div class="body">
+    <div class="facts" id="dFacts"></div>
+    <h3>The story</h3>
+    <div id="dStory"></div>
+    <h3>The science it made possible</h3>
+    <div class="science" id="dScience"></div>
+    <div class="still" id="dStill"></div>
+  </div>
+</aside>
+
+<script>
+/* ------------------------------------------------------------------
+   DATA — real NASA hardware. Fields kept short for classroom reading.
+   status: "gone" = silent/retired | "live" = still returning data
+------------------------------------------------------------------ */
+const DATA = {
+  moon: {
+    glow:"radial-gradient(circle,#8fb6ff,transparent 65%)",
+    terrain:`<svg viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3f4a60"/><stop offset="1" stop-color="#141a26"/>
+      </linearGradient></defs>
+      <path fill="url(#mg)" d="M0,150 C150,110 260,175 400,150 C540,125 640,90 780,130 C920,170 1050,120 1200,145 L1200,400 L0,400 Z"/>
+      <ellipse cx="300" cy="230" rx="95" ry="30" fill="#0d1119" opacity=".55"/>
+      <ellipse cx="880" cy="270" rx="130" ry="38" fill="#0d1119" opacity=".5"/>
+      <ellipse cx="620" cy="205" rx="60" ry="20" fill="#0d1119" opacity=".45"/>
+      <circle cx="180" cy="300" r="7" fill="#0d1119" opacity=".6"/>
+      <circle cx="1050" cy="230" r="5" fill="#0d1119" opacity=".6"/>
+    </svg>`,
+    items:[
+      {id:"a11", x:34, y:52, tag:"Apollo 11 Descent Stage", status:"live", year:"1969",
+       title:"Apollo 11 “Eagle” Descent Stage", where:"Sea of Tranquility, Moon",
+       facts:[["Jul 1969","Landed"],["2 people","Rode it"],["Still there","Status"]],
+       story:[
+         "On 20 July 1969 the lunar module Eagle touched down with less than 30 seconds of fuel left. When Buzz Aldrin and Neil Armstrong lifted off two days later, they left the descent stage behind — engine, fuel tanks, landing legs and all — because every kilogram saved was a kilogram they could carry home.",
+         "Aldrin called the view from the window “magnificent desolation.” The stage sits exactly where it landed, undisturbed by wind or rain, because the Moon has neither."
+       ],
+       science:"Its laser retroreflector is still aimed at Earth. Astronomers fire a laser at it and time the bounce, measuring the Earth–Moon distance to within a few millimetres — a measurement that also tests whether Einstein's general relativity holds.",
+       still:"Still working: the Apollo 11 retroreflector is used in ranging experiments to this day."},
+
+      {id:"surv7", x:63, y:44, tag:"Surveyor 7", status:"gone", year:"1968",
+       title:"Surveyor 7", where:"Tycho highlands, Moon",
+       facts:[["Jan 1968","Landed"],["7th of 7","Series"],["Surface","Studied"]],
+       story:[
+         "Surveyor 7 was the last of seven robotic scouts sent to answer one terrifying question: is the lunar surface solid enough to land a crewed spacecraft on, or will it swallow them like quicksand?",
+         "It landed near the rim of Tycho crater, tilted about 15°, and spent two weeks photographing the terrain and digging with its scoop."
+       ],
+       science:"The Surveyor programme proved the soil could bear weight and gave NASA the surface pictures it needed to plan Apollo landings. Without Surveyor, Apollo would have been a blind gamble.",
+       still:"Silent since 1968 — but its images still teach geologists today."},
+
+      {id:"rv15", x:19, y:64, tag:"Apollo 15 Rover", status:"gone", year:"1971",
+       title:"Lunar Roving Vehicle (Apollo 15)", where:"Hadley–Apennine, Moon",
+       facts:[["1971","Deployed"],["27 km","Range"],["3 left","On Moon"]],
+       story:[
+         "Three battery-powered buggies — Apollo 15, 16 and 17 — are parked where their crews finished with them. Each could fold up under the lander's descent stage, and each let astronauts explore far beyond walking distance.",
+         "Apollo 15's crew drove 27.9 km and hauled 77 kg of rock samples back to Earth."
+       ],
+       science:"The rovers turned a landing site into a field expedition. Apollo 15 discovered the famous “Genesis Rock,” an ancient fragment of the Moon's original crust — evidence of how the lunar oceans of magma solidified.",
+       still:"All three rovers remain on the Moon, tyre tracks preserved for millions of years."},
+
+      {id:"alsep", x:80, y:62, tag:"ALSEP Array", status:"gone", year:"1969–1977",
+       title:"ALSEP Experiment Stations", where:"Six sites across the Moon",
+       facts:[["5 stations","Built"],["1977","Powered off"],["Data","Returned"]],
+       story:[
+         "From Apollo 12 onward each crew deployed a package of experiments — seismometers, heat-flow probes, solar wind detectors — and then walked away, leaving them to work unattended.",
+         "In 1977 NASA sent the switch-off command. Power was finite, and the stations had already outlived their design life by years."
+       ],
+       science:"The Apollo seismometers detected moonquakes and revealed the Moon has a small, solid core. Heat-flow probes showed the lunar interior still leaks warmth from its formation 4.5 billion years ago.",
+       still:"One exception: the Apollo laser reflectors are still unpowered but still reflecting."},
+
+      {id:"ody", x:50, y:70, tag:"Odysseus IM-1", status:"gone", year:"2024",
+       title:"Odysseus (Intuitive Machines IM-1)", where:"Near Malapert A, lunar south",
+       facts:[["Feb 2024","Landed"],["Tipped","Landed over"],["6 of 7","Instruments"]],
+       story:[
+         "The first US spacecraft to land on the Moon since 1972 touched down in February 2024 — then tipped onto its side, because its leg caught on the surface.",
+         "It was never designed to survive long. It was designed to prove a new model: commercial landers carrying NASA science to the Moon."
+       ],
+       science:"Even on its side, Odysseus returned data from six instruments, including measurements of the surface and the plasma environment near the lunar south pole — the region where Artemis crews hope to land.",
+       still:"Silent now, but it opened the door for the CLPS commercial lunar programme."}
+    ]
+  },
+
+  mars: {
+    glow:"radial-gradient(circle,#ff7a4d,transparent 65%)",
+    terrain:`<svg viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#9c4a2c"/><stop offset="1" stop-color="#2a1109"/>
+      </linearGradient></defs>
+      <path fill="url(#rg)" d="M0,170 C120,130 240,190 360,165 C480,140 560,185 700,160 C840,135 980,185 1200,155 L1200,400 L0,400 Z"/>
+      <ellipse cx="420" cy="250" rx="140" ry="40" fill="#1c0a05" opacity=".5"/>
+      <ellipse cx="950" cy="290" rx="110" ry="34" fill="#1c0a05" opacity=".45"/>
+      <ellipse cx="150" cy="300" rx="70" ry="24" fill="#1c0a05" opacity=".45"/>
+      <path d="M640,220 q60,-25 130,-6" stroke="#1c0a05" stroke-width="9" fill="none" opacity=".55"/>
+    </svg>`,
+    items:[
+      {id:"soj", x:28, y:48, tag:"Sojourner", status:"gone", year:"1997",
+       title:"Sojourner Rover", where:"Ares Vallis, Mars",
+       facts:[["650 g","Weight"],["65 cm","Long"],["1997","Died"]],
+       story:[
+         "Sojourner was the size of a microwave oven and the first wheeled vehicle to drive on another planet. It rolled off its lander in July 1997 and spent its whole life within a few metres of it.",
+         "It survived three times longer than planned, then went silent when its battery could no longer survive the freezing Martian night."
+       ],
+       science:"Its spectrometer analysed rocks at Ares Vallis — a flood plain — and confirmed the rocks had been shaped by water. Sojourner was the proof of concept for every rover that followed.",
+       still:"It sits where it stopped in 1997, wheels still on the ground."},
+
+      {id:"spir", x:55, y:41, tag:"Spirit", status:"gone", year:"2004–2011",
+       title:"Spirit Rover (MER-A)", where:"Gusev Crater / Columbia Hills, Mars",
+       facts:[["6 yrs","Drove"],["22 km","Distance"],["Silica","Discovery"]],
+       story:[
+         "Spirit landed in January 2004 for a 90-day mission. It kept going for six years, climbing the Columbia Hills when its original plan stalled in soft soil.",
+         "In 2009 one wheel jammed — so engineers dragged it backwards, using the stuck wheel as a plough, and kept driving."
+       ],
+       science:"Spirit found deposits of pure silica left by hot springs or steam vents — strong evidence that Gusev Crater once hosted warm, water-driven chemistry suitable for life.",
+       still:"Wheels stuck in the soil where it went silent in 2010; declared dead in 2011."},
+
+      {id:"opp", x:76, y:57, tag:"Opportunity", status:"gone", year:"2004–2019",
+       title:"Opportunity Rover (MER-B)", where:"Meridiani Planum, Mars",
+       facts:[["15 yrs","Ran"],["45 km","Distance"],["1,000+","Sols"]],
+       story:[
+         "Opportunity was built for 90 days. It lasted almost 15 years and drove 45 kilometres — a record that stood until Perseverance.",
+         "It ended in June 2018 when a planet-wide dust storm blotted out the Sun and drained its battery. Its final message was paraphrased by a NASA scientist as: “My battery is low and it's getting dark.”"
+       ],
+       science:"Opportunity found small grey hematite “blueberries” — spheres that only form in water — plus minerals deposited from an acidic ancient sea. Mars was once wet, and Opportunity proved it on the ground.",
+       still:"Silent since June 2018. NASA declared the mission over in February 2019."},
+
+      {id:"ins", x:44, y:68, tag:"InSight", status:"gone", year:"2018–2022",
+       title:"InSight Lander", where:"Elysium Planitia, Mars",
+       facts:[["1,300+","Marsquakes"],["4 yrs","Ran"],["2022","Died"]],
+       story:[
+         "InSight wasn't a rover — it never moved. It planted a seismometer under a windshield shield and sat perfectly still, listening to the planet's heartbeat.",
+         "Dust slowly coated its solar panels until it could no longer charge. NASA held a final command “listening” session in December 2022 before it went dark for good."
+       ],
+       science:"InSight recorded more than 1,300 marsquakes, mapped the size of Mars's core, and showed the planet is more geologically alive than anyone expected. We now know what the inside of Mars looks like.",
+       still:"The seismometer stays where it was placed — the first geophysical station on another planet."},
+
+      {id:"phe", x:67, y:76, tag:"Phoenix", status:"gone", year:"2008",
+       title:"Phoenix Mars Lander", where:"Vastitas Borealis (north pole), Mars",
+       facts:[["May 2008","Landed"],["Ice","Dug up"],["Nov 2008","Died"]],
+       story:[
+         "Phoenix was designed to survive one Martian winter at the north pole. It made it through the summer, scraped away the soil with a robotic arm, and found white ice directly underneath.",
+         "When darkness and cold arrived in November 2008, its solar panels could not recharge the battery. It fell silent — exactly as predicted."
+       ],
+       science:"Phoenix confirmed water ice at high latitude and measured the chemistry of the soil. It also found perchlorates — salts that affect both Martian chemistry and the safety of future human crews.",
+       still:"Its arms and instruments are probably still buried under a coating of frost and dust."},
+
+      {id:"vik", x:20, y:63, tag:"Viking 1", status:"gone", year:"1976–1982",
+       title:"Viking 1 Lander", where:"Chryse Planitia, Mars",
+       facts:[["1976","Landed"],["6 yrs","Operated"],["First","US Mars landing"]],
+       story:[
+         "Viking 1 made the first successful US landing on Mars on 20 July 1976 — seven years to the day after Apollo 11 touched the Moon.",
+         "It worked for six years, longer than anyone expected, and sent back the first colour panorama of the Martian surface."
+       ],
+       science:"Its biology experiments famously produced ambiguous results that scientists still debate today. It also revealed a soil chemistry that puzzled chemists for decades — the beginning of modern Mars science.",
+       still:"Standing on Chryse Planitia since 1976 — the oldest functioning object humans sent to Mars."}
+    ]
+  },
+
+  deep: {
+    glow:"radial-gradient(circle,#b48bff,transparent 65%)",
+    terrain:`<svg viewBox="0 0 1200 400" preserveAspectRatio="none">
+      <defs><radialGradient id="sg" cx="50%" cy="55%" r="55%">
+        <stop offset="0" stop-color="#e8c98a"/><stop offset="55%" stop-color="#a9743c"/><stop offset="100%" stop-color="#2b1a0c"/>
+      </radialGradient>
+      <radialGradient id="ring" cx="50%" cy="50%">
+        <stop offset="60%" stop-color="transparent"/><stop offset="62%" stop-color="#e8d5a8"/><stop offset="66%" stop-color="#e8d5a8"/><stop offset="68%" stop-color="transparent"/>
+      </radialGradient></defs>
+      <ellipse cx="700" cy="300" rx="330" ry="120" fill="url(#sg)"/>
+      <ellipse cx="700" cy="300" rx="470" ry="70" fill="none" stroke="url(#ring)" stroke-width="16" opacity=".75"/>
+      <ellipse cx="240" cy="330" rx="170" ry="70" fill="#0b1020" opacity=".0"/>
+      <circle cx="240" cy="180" r="46" fill="#22304e"/>
+    </svg>`,
+    items:[
+      {id:"cas", x:72, y:47, tag:"Cassini", status:"gone", year:"1997–2017",
+       title:"Cassini–Huygens", where:"Saturn, deep space",
+       facts:[["22 yrs","Mission"],["Grand Finale","End"],["144","Orbits"]],
+       story:[
+         "Cassini spent 20 years at Saturn and discovered that Enceladus shoots geysers of ocean water into space. In 2017 it was deliberately flown into Saturn's atmosphere to avoid ever contaminating those moons.",
+         "Its last signals arrived on 15 September 2017, while engineers watched in silence."
+       ],
+       science:"Cassini revealed a global liquid ocean under Enceladus and a methane sea on Titan — two of the most promising places to look for life beyond Earth. Its Grand Finale orbits mapped Saturn's interior.",
+       still:"Destroyed by design. Its data is still being re-analysed by scientists today."},
+
+      {id:"gal", x:38, y:38, tag:"Galileo", status:"gone", year:"1989–2003",
+       title:"Galileo", where:"Jupiter, deep space",
+       facts:[["14 yrs","Mission"],["2003","Crashed"],["Europa","Ocean found"]],
+       story:[
+         "Galileo was the first spacecraft to orbit Jupiter. In 2003 its fuel ran out, and NASA chose to crash it into Jupiter rather than let it drift and possibly strike Europa — a moon that might harbour life.",
+         "It burned up on 21 September 2003 at huge speed, deliberately."
+       ],
+       science:"Galileo produced the first strong evidence for a salty liquid ocean beneath Europa's ice — a discovery that directly drives today's Europa Clipper mission.",
+       still:"Gone on purpose, to protect a world we haven't even visited yet."},
+
+      {id:"kep", x:58, y:24, tag:"Kepler", status:"gone", year:"2009–2018",
+       title:"Kepler Space Telescope", where:"Earth-trailing solar orbit",
+       facts:[["2,600+","Exoplanets"],["9 yrs","Ran"],["Retired","2018"]],
+       story:[
+         "Kepler stared at one patch of 150,000 stars, watching for the tiny dip in brightness when a planet crossed in front of its star.",
+         "When reaction wheels failed in 2013 it was given a second life as K2, using sunlight as a stabiliser — then retired in 2018 and left in an orbit trailing Earth."
+       ],
+       science:"Kepler proved that planets are everywhere. It found more than 2,600 confirmed exoplanets and told us that most stars in the galaxy have planets — statistics we simply did not have before.",
+       still:"Silent since 2018, drifting behind Earth in a stable solar orbit."},
+
+      {id:"lcr", x:86, y:66, tag:"LCROSS Impactor", status:"gone", year:"2009",
+       title:"LCROSS (Lunar Crater Observation)", where:"Cabeus crater, lunar south pole",
+       facts:[["Oct 2009","Impacted"],["Water","Confirmed"],["2 stages","Left behind"]],
+       story:[
+         "This wasn't an accident. LCROSS intentionally slammed its rocket stage into a permanently shadowed crater at the Moon's south pole at 9,000 km/h, then flew through the plume of debris it kicked up to analyse it.",
+         "The observing spacecraft followed behind, gathering data, before looping away."
+       ],
+       science:"The impact confirmed water ice in permanently shadowed lunar craters — a resource future astronauts could turn into drinking water and rocket fuel. It changed where we plan to land.",
+       still:"The impactor's debris is now spread across the floor of Cabeus crater."},
+
+      {id:"voy", x:16, y:56, tag:"Voyager 1 & 2", status:"live", year:"1977–",
+       title:"Voyager 1 & 2", where:"Interstellar space",
+       facts:[["1977","Launched"],["Interstellar","Now"],["2 still","Talking"]],
+       story:[
+         "Not everything is abandoned. Launched in 1977, both Voyagers are still communicating from interstellar space — the most distant human-made objects in existence.",
+         "Each carries the Golden Record: sounds and images of Earth, in case anything ever finds them."
+       ],
+       science:"Voyagers confirmed ocean worlds at Jupiter and Saturn, found active volcanoes on Io, and are now measuring the boundary where the Sun's wind meets interstellar space.",
+       still:"STILL TALKING: signals take about 22 hours to reach Voyager 1 from Earth."}
+    ]
+  }
+};
+
+/* ------------------------------------------------------------------ */
+const stage=document.getElementById('stage'),
+      spots=document.getElementById('spots'),
+      cards=document.getElementById('cards'),
+      terrain=document.getElementById('terrain'),
+      glow=document.getElementById('glow'),
+      drawer=document.getElementById('drawer'),
+      scrim=document.getElementById('scrim');
+let current='moon', lastFocus=null;
+
+function renderBody(key){
+  current=key;
+  const d=DATA[key];
+  glow.style.background=d.glow;
+  terrain.innerHTML=d.terrain;
+
+  spots.innerHTML='';
+  d.items.forEach((it,i)=>{
+    const b=document.createElement('button');
+    b.className='hotspot'+(it.status==='live'?' live':'');
+    b.style.left=it.x+'%'; b.style.top=it.y+'%';
+    b.style.animation=`fadeUp .5s ${i*70}ms both`;
+    b.innerHTML=`<span class="dot"></span><span class="tag">${it.tag}</span>`;
+    b.setAttribute('aria-label','Open story: '+it.title);
+    b.onclick=()=>openStory(it);
+    spots.appendChild(b);
+  });
+
+  cards.innerHTML='';
+  d.items.forEach(it=>{
+    const c=document.createElement('button');
+    c.className='card';
+    c.innerHTML=`<div class="yr">${it.year}</div>
+      <h4>${it.title}</h4><p>${it.story[0].slice(0,118)}…</p>
+      <span class="st ${it.status==='live'?'live':''}">${it.status==='live'?'Still returning science':'Silent'}</span>`;
+    c.onclick=()=>openStory(it);
+    cards.appendChild(c);
+  });
+}
+
+function openStory(it){
+  lastFocus=document.activeElement;
+  document.getElementById('dBadge').textContent = it.status==='live'?'Still returning science':'Abandoned';
+  document.getElementById('dBadge').className='badge'+(it.status==='live'?' live':' gone');
+  document.getElementById('dTitle').textContent=it.title;
+  document.getElementById('dWhere').textContent=it.where;
+  document.getElementById('dFacts').innerHTML=
+    it.facts.map(f=>`<div><b>${f[0]}</b><span>${f[1]}</span></div>`).join('');
+  document.getElementById('dStory').innerHTML=it.story.map(p=>`<p>${p}</p>`).join('');
+  document.getElementById('dScience').textContent=it.science;
+  document.getElementById('dStill').textContent=it.still;
+  drawer.classList.add('open'); scrim.classList.add('on');
+  document.getElementById('dClose').focus();
+}
+function closeStory(){
+  drawer.classList.remove('open'); scrim.classList.remove('on');
+  if(lastFocus) lastFocus.focus();
+}
+document.getElementById('dClose').onclick=closeStory;
+scrim.onclick=closeStory;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeStory()});
+
+document.getElementById('switcher').addEventListener('click',e=>{
+  const btn=e.target.closest('button'); if(!btn) return;
+  document.querySelectorAll('#switcher button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderBody(btn.dataset.body);
+});
+
+const style=document.createElement('style');
+style.textContent='@keyframes fadeUp{from{opacity:0;transform:translate(-50%,calc(-50% + 14px))}to{opacity:1;transform:translate(-50%,-50%)}}';
+document.head.appendChild(style);
+
+renderBody('moon');
+</script>
+</body>
+</html>

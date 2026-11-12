@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRAPHIC NOVEL — "My Battery Is Low"</title>
+<style>
+  :root{
+    --ink:#0d0b0a; --paper:#f3e9d7; --rust:#c1440e; --sand:#e8b872;
+    --sky:#2b1d3a; --panel:#fffaf0;
+    --font-d:"Impact","Haettenschweiler","Arial Narrow Bold",sans-serif;
+    --font-b:Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:#151016; color:var(--ink); font-family:var(--font-b); line-height:1.6}
+
+  /* halftone + paper texture */
+  .paper{
+    background-color:var(--paper);
+    background-image:
+      radial-gradient(rgba(0,0,0,.055) 1px, transparent 1.1px),
+      radial-gradient(rgba(0,0,0,.03) 1px, transparent 1.1px);
+    background-size:5px 5px, 9px 9px;
+    background-position:0 0, 3px 4px;
+  }
+
+  /* ---------- COVER ---------- */
+  .cover{
+    min-height:100vh; display:flex; flex-direction:column;
+    justify-content:center; align-items:center; text-align:center;
+    position:relative; overflow:hidden; padding:60px 24px;
+    background:linear-gradient(175deg,#3b1f2e 0%,#7b3418 45%,#c1440e 100%);
+    color:#fff5e6;
+  }
+  .cover::before{
+    content:""; position:absolute; inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.5) 1px, transparent 1.4px);
+    background-size:7px 7px; opacity:.14;
+  }
+  .sun{
+    position:absolute; width:min(70vw,540px); aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle,#ffd98a,#ff9a3c 55%,transparent 72%);
+    bottom:-22%; left:50%; transform:translateX(-50%); filter:blur(2px); opacity:.85;
+  }
+  .cover-inner{position:relative; z-index:2; max-width:900px}
+  .issue{
+    display:inline-block; font-family:var(--font-d); letter-spacing:.28em;
+    font-size:12px; border:2px solid #fff5e6; padding:6px 16px; margin-bottom:26px;
+    text-transform:uppercase;
+  }
+  .cover h1{
+    font-family:var(--font-d); text-transform:uppercase;
+    font-size:clamp(46px,11vw,140px); line-height:.86; letter-spacing:-1px;
+    text-shadow:6px 6px 0 rgba(0,0,0,.4);
+  }
+  .cover h1 em{display:block; color:var(--sand); font-style:normal; -webkit-text-stroke:2px #0d0b0a}
+  .cover .tagline{
+    margin-top:26px; font-size:clamp(15px,2vw,21px); font-style:italic;
+    max-width:60ch; margin-inline:auto; color:#ffe9c9;
+  }
+  .byline{margin-top:34px; font-family:var(--font-d); letter-spacing:.2em; font-size:12px; opacity:.8}
+  .scroll-cue{
+    position:absolute; bottom:28px; left:50%; transform:translateX(-50%);
+    z-index:3; font-size:12px; letter-spacing:.3em; font-family:var(--font-d);
+    animation:bob 1.8s ease-in-out infinite;
+  }
+  @keyframes bob{50%{transform:translate(-50%,10px)}}
+
+  /* ---------- PAGE / PANELS ---------- */
+  .page{max-width:1080px; margin:0 auto; padding:70px 20px}
+  .page-head{margin-bottom:30px}
+  .chapter{
+    font-family:var(--font-d); letter-spacing:.24em; font-size:12px;
+    color:var(--rust); text-transform:uppercase;
+  }
+  .page-head h2{
+    font-family:var(--font-d); text-transform:uppercase;
+    font-size:clamp(30px,6vw,58px); line-height:.95; margin-top:8px;
+    -webkit-text-stroke:.5px var(--ink); color:var(--paper);
+    text-shadow:4px 4px 0 var(--ink);
+  }
+  .grid{display:grid; gap:16px; grid-template-columns:repeat(6,1fr)}
+  .panel{
+    position:relative; border:4px solid var(--ink); overflow:hidden;
+    min-height:230px; background:#241a20; box-shadow:7px 7px 0 rgba(13,11,10,.9);
+    display:flex; align-items:flex-end;
+    opacity:0; transform:translateY(34px); transition:.6s cubic-bezier(.2,.8,.3,1);
+  }
+  .panel.in{opacity:1; transform:none}
+  .panel .art{position:absolute; inset:0}
+  .art .sky{position:absolute; inset:0}
+  .art .ground{position:absolute; left:0; right:0; bottom:0; height:38%}
+  .art .sun{position:absolute; width:120px; aspect-ratio:1; border-radius:50%}
+  .art .craft{
+    position:absolute; left:50%; bottom:34%; transform:translateX(-50%);
+    width:90px; height:70px;
+  }
+  .art .craft::before{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(160deg,#d9d2c5,#8d8577);
+    clip-path:polygon(50% 0,100% 55%,80% 100%,20% 100%,0 55%);
+    border:3px solid var(--ink);
+  }
+  .art .craft::after{
+    content:""; position:absolute; left:8%; right:8%; bottom:-8px; height:14px;
+    background:#3b3630; border:3px solid var(--ink);
+  }
+  .art .legs{
+    position:absolute; left:50%; bottom:20%; transform:translateX(-50%);
+    width:130px; height:40px; border-bottom:5px solid var(--ink);
+    border-left:5px solid var(--ink); border-right:5px solid var(--ink);
+    transform-origin:bottom; transform:translateX(-50%) skewX(-16deg);
+  }
+  .art .rover{
+    position:absolute; width:64px; height:34px; background:#e6ddcc;
+    border:3px solid var(--ink); border-radius:4px;
+  }
+  .art .rover::after{
+    content:""; position:absolute; left:-5px; right:-5px; bottom:-11px; height:14px;
+    background:
+      radial-gradient(circle at 12% 50%, var(--ink) 7px, transparent 8px),
+      radial-gradient(circle at 38% 50%, var(--ink) 7px, transparent 8px),
+      radial-gradient(circle at 64% 50%, var(--ink) 7px, transparent 8px),
+      radial-gradient(circle at 90% 50%, var(--ink) 7px, transparent 8px);
+  }
+  .art .dust{
+    position:absolute; bottom:30%; width:100%; height:60px;
+    background:radial-gradient(ellipse at center, rgba(226,150,90,.55), transparent 70%);
+    filter:blur(6px);
+  }
+  .art .stars{
+    position:absolute; inset:0;
+    background-image:radial-gradient(#fff 1px,transparent 1.3px),radial-gradient(#ffe6c0 1px,transparent 1.3px);
+    background-size:47px 47px,83px 83px; background-position:0 0,21px 33px;
+  }
+  .art .eye{
+    position:absolute; left:50%; top:46%; transform:translate(-50%,-50%);
+    width:130px; height:130px; border-radius:50%;
+    background:radial-gradient(circle at 40% 35%,#fff,#9fb4d8 40%,#1b2b4a 75%);
+    border:5px solid var(--ink); box-shadow:0 0 44px rgba(150,190,255,.6);
+  }
+
+  /* caption boxes */
+  .cap{
+    position:relative; z-index:3; margin:12px; padding:11px 14px;
+    background:var(--panel); border:3px solid var(--ink);
+    font-size:14.5px; line-height:1.5; max-width:88%;
+    box-shadow:4px 4px 0 rgba(13,11,10,.85);
+  }
+  .cap.narr{
+    font-style:italic;
+    background:#fdf6e6;
+    clip-path:polygon(0 0,100% 0,100% 86%,94% 100%,0 100%);
+  }
+  .cap.narr b{color:var(--rust); font-style:normal}
+  /* speech bubble */
+  .bubble{
+    position:absolute; z-index:4; top:16px; left:16px; max-width:74%;
+    background:#fff; border:3.5px solid var(--ink); border-radius:20px;
+    padding:12px 16px; font-size:15px; line-height:1.45;
+    box-shadow:5px 5px 0 rgba(13,11,10,.8);
+  }
+  .bubble::after{
+    content:""; position:absolute; bottom:-18px; left:26px;
+    border:10px solid transparent; border-top-color:#fff;
+    filter:drop-shadow(0 3px 0 var(--ink));
+  }
+  .bubble.think{border-radius:26px; font-style:italic; background:#eef4ff}
+  .bubble.think::after{border-radius:50%; width:14px; height:14px; border:0; background:#fff; bottom:-24px; box-shadow:0 8px 0 -2px #fff,0 8px 0 1px var(--ink)}
+  .who{
+    position:absolute; z-index:4; bottom:14px; right:14px;
+    font-family:var(--font-d); font-size:11px; letter-spacing:.16em;
+    background:var(--ink); color:var(--sand); padding:5px 11px; text-transform:uppercase;
+  }
+  .sfx{
+    position:absolute; z-index:5; font-family:var(--font-d);
+    font-size:clamp(38px,7vw,86px); color:var(--sand);
+    -webkit-text-stroke:3px var(--ink); transform:rotate(-9deg);
+    top:34%; left:50%; translate:-50% -50%; text-align:center; pointer-events:none;
+  }
+
+  .c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}
+  .tall{min-height:340px}
+
+  /* ---------- FACT FILE ---------- */
+  .factfile{
+    border:5px solid var(--ink); background:#101820; color:#e8f0ff;
+    padding:34px 30px; margin-top:26px; box-shadow:10px 10px 0 var(--rust);
+  }
+  .factfile h3{
+    font-family:var(--font-d); letter-spacing:.2em; text-transform:uppercase;
+    color:var(--sand); font-size:16px; margin-bottom:6px;
+  }
+  .factfile .sub{color:#8fa6cc; font-size:13.5px; font-style:italic; margin-bottom:20px}
+  .factgrid{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+  .fact{border:2px solid #2f4468; padding:14px; background:#16233a; border-radius:4px}
+  .fact b{display:block; font-family:var(--font-d); font-size:24px; color:#7fe0ff; letter-spacing:.04em}
+  .fact span{font-size:12px; color:#a9bfe0; text-transform:uppercase; letter-spacing:.1em}
+  .fact p{font-size:13px; color:#c9d8f2; margin-top:8px; line-height:1.5}
+  .source{margin-top:18px; font-size:11.5px; color:#6f86ab; font-style:italic}
+
+  /* ---------- END PAGE ---------- */
+  .end{
+    text-align:center; padding:80px 24px 60px;
+    background:linear-gradient(0deg,#1a1220,#2b1d3a);
+    color:#ffe9c9;
+  }
+  .end h2{font-family:var(--font-d); font-size:clamp(34px,8vw,84px); text-transform:uppercase; line-height:.95}
+  .end h2 span{color:var(--sand)}
+  .end p{max-width:62ch; margin:20px auto 0; font-size:16.5px; font-style:italic; color:#e0cbb0}
+  .credits{margin-top:34px; font-family:var(--font-d); letter-spacing:.2em; font-size:11.5px; color:#9d8ba8}
+  .cta{
+    display:inline-block; margin-top:26px; font-family:var(--font-d);
+    letter-spacing:.16em; text-transform:uppercase; font-size:13px;
+    background:var(--rust); color:#fff; border:3px solid var(--ink);
+    padding:14px 28px; text-decoration:none; box-shadow:6px 6px 0 #000;
+    transition:.15s;
+  }
+  .cta:hover{transform:translate(-2px,-2px); box-shadow:9px 9px 0 #000}
+
+  /* progress bar */
+  .prog{position:fixed; top:0; left:0; height:5px; background:var(--rust); z-index:99; width:0}
+
+  @media(max-width:820px){
+    .grid{grid-template-columns:1fr}
+    .c2,.c3,.c4,.c6{grid-column:span 1}
+    .tall{min-height:260px}
+  }
+</style>
+<link rel="stylesheet" href="kid-mode.css">
+<script src="kid-mode.js"></script>
+</head>
+<body>
+<div class="prog" id="prog"></div>
+
+<!-- ============ COVER ============ -->
+<section class="cover">
+  <div class="sun"></div>
+  <div class="cover-inner">
+    <span class="issue">Issue No. 1 · A True Space Story</span>
+    <h1>MY BATTERY<em>IS LOW</em></h1>
+    <p class="tagline">Fifteen years of dust, water and silence — the last transmission from a rover that was only built to last ninety days.</p>
+    <div class="byline">Based on the real mission of Opportunity · Mars Exploration Rover B</div>
+  </div>
+  <div class="scroll-cue">▼ SCROLL TO READ ▼</div>
+</section>
+
+<!-- ============ CHAPTER 1 ============ -->
+<div class="page paper">
+  <div class="page-head">
+    <div class="chapter">Chapter One</div>
+    <h2>Ninety days</h2>
+  </div>
+
+  <div class="grid">
+    <div class="panel c4 tall">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#ffd9a0,#e07b3c 60%,#8c3a15)"></div>
+        <div class="sun" style="background:radial-gradient(circle,#fff2cf,#ffb454); right:14%; top:14%"></div>
+        <div class="dust" style="left:10%"></div>
+        <div class="legs"></div>
+        <div class="craft"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#a34c22,#5e2712); border-top:4px solid var(--ink)"></div>
+      </div>
+      <div class="bubble">Touchdown confirmed. Welcome to Meridiani Planatum.</div>
+      <div class="who">JPL · Jan 25, 2004</div>
+    </div>
+
+    <div class="panel c2 tall">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#2b1d3a,#6b3320)"></div>
+        <div class="art-stars"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#8a4020,#41190c); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:24%; bottom:36%"></div>
+      </div>
+      <div class="cap narr"><b>We were built for 90 sols.</b> Ninety days of driving, measuring, looking. Then we were supposed to go quiet.</div>
+    </div>
+
+    <div class="panel c3">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#f0a95c,#c1440e)"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#9b4722,#4d2010); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:44%; bottom:38%; width:80px;height:42px"></div>
+        <div class="dust" style="left:-10%; width:60%"></div>
+      </div>
+      <div class="sfx">VRRRM!</div>
+      <div class="cap">First drive: a whole 9 metres. Mission control cheered like it was a marathon.</div>
+    </div>
+
+    <div class="panel c3">
+      <div class="art">
+        <div class="sky" style="background:radial-gradient(circle at 30% 40%,#4a2b1c,#1c0f0a)"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#7d3a1c,#2e1208); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:40%; bottom:36%; background:#c9c0b0"></div>
+      </div>
+      <div class="bubble think">Everyone keeps saying “90 days.” Nobody told the Sun.</div>
+      <div class="who">Opportunity</div>
+    </div>
+  </div>
+
+  <!-- FACT FILE -->
+  <div class="factfile">
+    <h3>▮ Mission Fact File — Opportunity (MER-B)</h3>
+    <div class="sub">The science behind the story</div>
+    <div class="factgrid">
+      <div class="fact"><b>90 sols</b><span>Planned lifespan</span><p>Engineers designed it to work for three months. It kept operating for almost fifteen years.</p></div>
+      <div class="fact"><b>45 km</b><span>Total distance driven</span><p>A record for off-world driving that stood until NASA's Perseverance rover.</p></div>
+      <div class="fact"><b>Blueberries</b><span>The key discovery</span><p>Thousands of small grey hematite spheres covering the ground — they only form in liquid water.</p></div>
+      <div class="fact"><b>Jun 2018</b><span>The end</span><p>A planet-wide dust storm cut off sunlight. The battery drained and the rover fell silent.</p></div>
+    </div>
+    <div class="source">Figures from NASA/JPL–Caltech Mars Exploration Rover mission records. Verify against the Resources tab before submitting.</div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 2 ============ -->
+<div class="page paper">
+  <div class="page-head">
+    <div class="chapter">Chapter Two</div>
+    <h2>The stones that sang</h2>
+  </div>
+
+  <div class="grid">
+    <div class="panel c2">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#ffcf94,#d1601f)"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#a8532a,#5a2410); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:34%; bottom:40%"></div>
+      </div>
+      <div class="cap narr"><b>Meridiani was a beach.</b> Not a beach with water today — a beach where water used to be.</div>
+    </div>
+
+    <div class="panel c4">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#e8a05c,#a63f14)"></div>
+        <div class="ground" style="background:
+             radial-gradient(circle at 20% 60%,#6a6a6a 4px,transparent 5px),
+             radial-gradient(circle at 44% 74%,#6a6a6a 3.5px,transparent 4.5px),
+             radial-gradient(circle at 70% 58%,#6a6a6a 4px,transparent 5px),
+             linear-gradient(180deg,#a8532a,#5a2410); border-top:4px solid var(--ink)"></div>
+      </div>
+      <div class="bubble">These spherules… they're hematite. They form in water. This whole plain was underwater.</div>
+      <div class="who">Opportunity · Sol 33</div>
+    </div>
+
+    <div class="panel c3">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#241a2e,#7a3a1c)"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#8f4522,#3c180a); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:36%; bottom:34%"></div>
+      </div>
+      <div class="cap"><b>Endurance Crater.</b> We drove down into it — a rover that could never climb back out — because the rocks at the bottom were 100 million years older than the surface.</div>
+    </div>
+
+    <div class="panel c3">
+      <div class="art">
+        <div class="sky" style="background:radial-gradient(circle at 50% 30%,#3c2440,#140d1a)"></div>
+        <div class="stars"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#7a3a1c,#2a1008); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:40%; bottom:34%"></div>
+      </div>
+      <div class="bubble think">There is no air up here. No rain to wash me clean. When I stop, I stop forever.</div>
+      <div class="who">Opportunity</div>
+    </div>
+  </div>
+
+  <div class="factfile">
+    <h3>▮ Science Fact File — Water on Mars</h3>
+    <div class="sub">What these discoveries actually proved</div>
+    <div class="factgrid">
+      <div class="fact"><b>Hematite</b><span>Mineral found</span><p>Grey "blueberries" littered the ground. Hematite crystallises from water — so Meridiani once held standing water.</p></div>
+      <div class="fact"><b>Rock layers</b><span>Read like pages</span><p>Sedimentary bands in Endurance Crater recorded repeated wetting and drying — a habitable chemistry.</p></div>
+      <div class="fact"><b>Sulfates</b><span>Acidic sea</span><p>The minerals pointed to a shallow, salty, somewhat acidic sea — not a gentle lake.</p></div>
+      <div class="fact"><b>1,300+ sols</b><span>Solar-panel survival</span><p>Dust storms repeatedly cleaned the panels by wind gusts, extending the mission far beyond plan.</p></div>
+    </div>
+    <div class="source">Science summary based on NASA/JPL MER mission findings.</div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 3 ============ -->
+<div class="page paper">
+  <div class="page-head">
+    <div class="chapter">Chapter Three</div>
+    <h2>It's getting dark</h2>
+  </div>
+
+  <div class="grid">
+    <div class="panel c6" style="min-height:400px">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#3a1f14,#8c3a15 55%,#c1440e)"></div>
+        <div class="dust" style="bottom:20%; width:120%; left:-10%; height:180px; background:radial-gradient(ellipse,rgba(255,190,120,.6),transparent 70%)"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#7a3a1c,#2a1008); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:46%; bottom:36%; width:76px; height:40px"></div>
+      </div>
+      <div class="bubble" style="left:auto; right:20px; top:20px; max-width:60%">
+        A global dust storm has engulfed Mars. Sunlight has dropped by more than 99%.
+      </div>
+      <div class="who">JPL · June 2018</div>
+    </div>
+
+    <div class="panel c4 tall">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#1b1020,#3a1f14)"></div>
+        <div class="art" style="background:radial-gradient(circle at 50% 45%,rgba(180,80,255,.25),transparent 60%)"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#4a2616,#180a05); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:42%; bottom:36%; background:#8d8577"></div>
+      </div>
+      <div class="cap narr"><b>The dust blocked the Sun for months.</b> My panels could not charge. Each night I had a little less to give.</div>
+      <div class="who" style="bottom:14px; left:14px; right:auto">Opportunity · Sol 5111</div>
+    </div>
+
+    <div class="panel c2 tall">
+      <div class="art">
+        <div class="sky" style="background:radial-gradient(circle at 50% 40%,#2c1a3d,#0b0710)"></div>
+        <div class="stars"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#3a1c10,#120704); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:36%; bottom:36%; background:#5a544c"></div>
+      </div>
+      <div class="bubble think" style="top:auto; bottom:56px">My battery is low…<br>and it's getting dark.</div>
+      <div class="who">Final message</div>
+    </div>
+
+    <div class="panel c3">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#0b0710,#1d1424)"></div>
+        <div class="stars"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#3a1c10,#0f0603); border-top:4px solid var(--ink)"></div>
+      </div>
+      <div class="sfx" style="color:#8fa6cc; top:28%">…</div>
+      <div class="cap" style="background:#eef4ff">Over 1,000 attempts to re-establish contact. No answer.</div>
+    </div>
+
+    <div class="panel c3">
+      <div class="art">
+        <div class="sky" style="background:linear-gradient(180deg,#12101c,#241a2e)"></div>
+        <div class="stars"></div>
+        <div class="ground" style="background:linear-gradient(180deg,#5e2a14,#180a05); border-top:4px solid var(--ink)"></div>
+        <div class="rover" style="left:44%; bottom:36%; background:#4e483f"></div>
+      </div>
+      <div class="cap"><b>February 2019.</b> NASA declared the mission over. Opportunity remains at Meridiani Planum — wheels on the ground, arm folded, facing the sky it could no longer see.</div>
+    </div>
+  </div>
+
+  <div class="factfile">
+    <h3>▮ Legacy File — Why abandoned machines matter</h3>
+    <div class="sub">What these silent robots left behind</div>
+    <div class="factgrid">
+      <div class="fact"><b>2 rovers</b><span>Both still there</span><p>Spirit and Opportunity remain on Mars. No wind, no rain — their tracks may last for millions of years.</p></div>
+      <div class="fact"><b>6,348 sols</b><span>Opportunity's total</span><p>More than 21 times its planned lifespan, and 45 km of driving across an alien plain.</p></div>
+      <div class="fact"><b>InSight</b><span>Next to fall silent</span><p>The stationary lander died in December 2022 after dust smothered its solar panels — the same fate.</p></div>
+      <div class="fact"><b>Still useful</b><span>Why keep them</span><p>Orbiters photograph the landing sites. The hardware becomes a landmark and a long-baseline science record.</p></div>
+    </div>
+    <div class="source">Lifespans and dates per NASA/JPL mission timelines.</div>
+  </div>
+</div>
+
+<!-- ============ END ============ -->
+<section class="end">
+  <h2>THE STORY ISN'T <span>OVER</span></h2>
+  <p>Six more machines are waiting on this page — a lander that dug up ice, a rover that ploughed with its own broken wheel, and two Voyagers still whispering from interstellar space.</p>
+  <a class="cta" href="01-ghost-rover-map.html">▸ Open the interactive Ghost Map</a>
+  <div class="credits">A story-driven educational prototype · 2026 NASA Space Apps Challenge<br>Fact-check all figures against official mission records before submission.</div>
+</section>
+
+<script>
+  // reveal panels on scroll
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.18});
+  document.querySelectorAll('.panel').forEach(p=>io.observe(p));
+  // reading progress
+  addEventListener('scroll',()=>{
+    const h=document.documentElement;
+    document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  },{passive:true});
+</script>
+</body>
+</html>

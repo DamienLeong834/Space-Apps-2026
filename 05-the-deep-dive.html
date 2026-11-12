@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE DEEP DIVE — Abandoned but not Forgotten</title>
+<style>
+  :root{
+    --void:#04060e; --panel:#0b1120; --line:#1e2946;
+    --ink:#e6eeff; --muted:#7f8fb5;
+    --cyan:#5be7ff; --gold:#ffd166; --green:#5ff7a5; --red:#ff6b6b; --violet:#a78bfa;
+    --mono:"Consolas","SFMono-Regular",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--void); color:var(--ink); overflow:hidden;
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    background-image:radial-gradient(700px 400px at 85% -10%, rgba(91,231,255,.09), transparent),
+                     radial-gradient(700px 420px at 0% 110%, rgba(167,139,250,.09), transparent);
+  }
+
+  /* ================= HUD ================= */
+  .hud{
+    position:fixed; top:0; left:0; right:0; z-index:60;
+    display:flex; align-items:center; gap:26px; flex-wrap:wrap;
+    padding:13px 22px; background:rgba(4,6,14,.94);
+    border-bottom:1px solid var(--line); backdrop-filter:blur(10px);
+  }
+  .brand{min-width:0}
+  .brand .kick{font-family:var(--mono); font-size:10px; letter-spacing:.3em; color:var(--cyan); text-transform:uppercase}
+  .brand h1{font-size:18px; font-weight:900; letter-spacing:-.6px; line-height:1.15; white-space:nowrap}
+  .brand h1 span{color:var(--gold)}
+  .readouts{display:flex; gap:22px; margin-left:auto; align-items:center; flex-wrap:wrap}
+  .ro{text-align:right}
+  .ro .lbl{font-family:var(--mono); font-size:9.5px; letter-spacing:.22em; color:var(--muted); text-transform:uppercase}
+  .ro .val{font-family:var(--mono); font-size:20px; font-weight:700; line-height:1.15; color:var(--cyan)}
+  .ro .val.sm{font-size:14px}
+  .ro .val.gold{color:var(--gold)}
+  .lives{display:flex; gap:5px; justify-content:flex-end}
+  .lives i{width:11px; height:11px; border-radius:50%; background:var(--red); box-shadow:0 0 10px var(--red); transition:.25s}
+  .lives i.off{background:#2a3352; box-shadow:none}
+  .depthbar{position:fixed; top:63px; left:0; right:0; height:3px; z-index:61; background:#101731}
+  .depthbar i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--gold)); box-shadow:0 0 16px var(--cyan); transition:width .9s cubic-bezier(.3,.9,.3,1)}
+
+  .app{display:grid; grid-template-columns:284px 1fr; height:100vh; padding-top:66px}
+
+  /* ============ LEFT RAIL (map / ladder) ============ */
+  .rail{border-right:1px solid var(--line); background:rgba(8,12,26,.78); overflow-y:auto; padding:16px 0 40px}
+  .rail::-webkit-scrollbar{width:8px}
+  .rail::-webkit-scrollbar-thumb{background:#1e2946; border-radius:8px}
+  .rail h2{font-family:var(--mono); font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--cyan); padding:0 16px; margin-bottom:13px}
+  .zone{position:relative; padding:8px 14px 9px 44px; min-height:44px; opacity:.32; transition:.45s; border-left:2px solid transparent}
+  .zone.seen{opacity:.78}
+  .zone.cur{opacity:1; background:linear-gradient(90deg,rgba(91,231,255,.12),transparent); border-left-color:var(--cyan)}
+  .zone::before{content:""; position:absolute; left:19px; top:0; bottom:0; width:1px; background:linear-gradient(180deg,transparent,var(--line) 20%,var(--line) 80%,transparent)}
+  .zone .knob{position:absolute; left:13px; top:12px; width:13px; height:13px; border-radius:50%; background:#0b1120; border:2px solid #2b3760; z-index:2; transition:.35s}
+  .zone.seen .knob{border-color:var(--cyan); background:var(--cyan); box-shadow:0 0 14px var(--cyan)}
+  .zone.cur .knob{border-color:var(--gold); background:var(--gold); box-shadow:0 0 18px var(--gold); transform:scale(1.28)}
+  .zone .zn{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink); font-weight:700}
+  .zone .zk{font-family:var(--mono); font-size:9.5px; color:var(--muted); margin-top:2px}
+  .zone.cur .zn{color:var(--gold)}
+  .beacons{display:flex; flex-wrap:wrap; gap:5px; margin-top:7px}
+  .beacon{
+    font:inherit; font-size:10px; font-family:var(--mono); letter-spacing:.04em;
+    background:rgba(255,209,102,.1); border:1px solid rgba(255,209,102,.35);
+    color:#ffd166; padding:3px 7px; border-radius:5px; cursor:pointer; transition:.18s;
+  }
+  .beacon:hover{background:var(--gold); color:#241a00; transform:translateY(-1px)}
+  .beacon:focus-visible{outline:2px solid var(--cyan); outline-offset:2px}
+  .beacon.locked{opacity:.28; pointer-events:none; background:none; border-style:dashed; color:var(--muted)}
+
+  /* ============ MAIN STAGE ============ */
+  .stage{position:relative; overflow:hidden; display:flex; flex-direction:column}
+  .sky{position:absolute; inset:0; pointer-events:none}
+  .stars{
+    position:absolute; inset:-10%;
+    background-image:
+      radial-gradient(1.6px 1.6px at 18% 24%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 74% 14%,#cfe4ff,transparent),
+      radial-gradient(1.7px 1.7px at 48% 68%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 88% 52%,#fff,transparent),
+      radial-gradient(1.4px 1.4px at 10% 80%,#dbe9ff,transparent),
+      radial-gradient(1.2px 1.2px at 62% 88%,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 33% 8%,#fff,transparent);
+    animation:drift 60s linear infinite;
+  }
+  @keyframes drift{to{transform:translate3d(-60px,80px,0)}}
+  .amb{position:absolute; opacity:.5; filter:drop-shadow(0 0 8px rgba(91,231,255,.4)); animation:float linear infinite; pointer-events:none}
+  @keyframes float{from{transform:translateY(-90px) rotate(0)}to{transform:translateY(120vh) rotate(320deg)}}
+  .glow{position:absolute; width:60vw; height:60vw; left:50%; top:38%; transform:translate(-50%,-50%); border-radius:50%; filter:blur(80px); opacity:.26; transition:background .8s; pointer-events:none}
+
+  .banner{position:relative; z-index:3; text-align:center; padding:30px 24px 4px; pointer-events:none}
+  .banner .zt{font-family:var(--mono); font-size:11px; letter-spacing:.4em; color:var(--cyan); text-transform:uppercase}
+  .banner h2{font-size:clamp(28px,5.4vw,60px); font-weight:900; letter-spacing:-2px; line-height:.95; margin-top:6px; text-transform:uppercase}
+  .banner .zk{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-top:9px}
+
+  /* ============ QUIZ ============ */
+  .quiz{
+    position:relative; z-index:4; margin:auto auto 0; width:min(770px,93%);
+    background:rgba(9,14,30,.95); border:1px solid var(--line); border-radius:18px;
+    padding:24px 26px 22px; box-shadow:0 30px 70px rgba(0,0,0,.6); backdrop-filter:blur(12px);
+  }
+  .qmeta{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:13px; flex-wrap:wrap}
+  .qn{font-family:var(--mono); font-size:10.5px; letter-spacing:.2em; color:var(--cyan); text-transform:uppercase}
+  .qtopic{font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase}
+  .quiz h3{font-size:19px; font-weight:800; line-height:1.4; letter-spacing:-.3px; margin-bottom:17px}
+  .typebar{display:flex; gap:9px; position:relative; padding-bottom:14px}
+  .typebar input{flex:1; font:inherit; font-size:17px; padding:15px 17px; border-radius:12px; background:rgba(255,255,255,.05); border:1.5px solid var(--line); color:var(--ink); outline:none; transition:.18s}
+  .typebar input:focus{border-color:var(--cyan); box-shadow:0 0 0 4px rgba(91,231,255,.14)}
+  .typebar input::placeholder{color:#5d6a8d}
+  .typebar button{font:inherit; font-family:var(--mono); font-size:19px; font-weight:700; width:56px; border-radius:12px; border:1.5px solid var(--cyan); background:var(--cyan); color:#04121a; cursor:pointer}
+  .typebar button:hover{filter:brightness(1.12)}
+  .typebar button:disabled,.typebar input:disabled{opacity:.5; cursor:default}
+  .timer{position:absolute; left:0; right:0; bottom:0; height:5px; background:#101731; border-radius:3px; overflow:hidden}
+  .timer i{display:block; height:100%; width:100%; background:var(--cyan); transition:width .25s linear}
+  .timer i.low{background:var(--red)}
+  .found{display:flex; flex-wrap:wrap; gap:7px; margin-top:14px}
+  .chip{font-family:var(--mono); font-size:11px; padding:6px 10px; border-radius:7px; background:rgba(95,247,165,.13); border:1.5px solid rgba(95,247,165,.5); color:#8df3c0; animation:pop .3s}
+  .chip b{color:var(--green)}
+  .chip.miss{background:rgba(255,107,107,.12); border-color:rgba(255,107,107,.45); color:#ffb0b0}
+  .opts{display:grid; gap:10px}
+  .opt{
+    display:flex; align-items:center; gap:13px; text-align:left; font:inherit;
+    background:rgba(255,255,255,.035); border:1.5px solid var(--line); border-radius:12px;
+    padding:13px 15px; cursor:pointer; color:var(--ink); font-size:14.5px; line-height:1.45;
+    transition:.18s; position:relative;
+  }
+  .opt:hover:not(:disabled){border-color:var(--cyan); background:rgba(91,231,255,.09); transform:translateX(4px)}
+  .opt:disabled{cursor:default}
+  .opt .rar{margin-left:auto; flex:none; font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; padding:4px 8px; border-radius:4px}
+  .opt .txt{flex:1}
+  .opt.correct{border-color:var(--green); background:rgba(95,247,165,.14)}
+  .opt.wrong{border-color:var(--red); background:rgba(255,107,107,.13); opacity:.72}
+  .opt.dim{opacity:.4}
+  .explain{margin-top:16px; padding:15px 17px; border-radius:11px; background:rgba(91,231,255,.08); border-left:3px solid var(--cyan); font-size:14px; line-height:1.62; color:#c6d6f5; display:none}
+  .explain.on{display:block; animation:pop .35s}
+  .explain b{color:var(--cyan)}
+  .explain .gain{font-family:var(--mono); color:var(--gold); font-weight:700}
+  @keyframes pop{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .next{
+    display:none; margin-top:16px; width:100%; font:inherit; font-weight:700;
+    font-family:var(--mono); letter-spacing:.16em; text-transform:uppercase; font-size:12.5px;
+    background:var(--cyan); color:#04121a; border:0; border-radius:11px; padding:15px; cursor:pointer;
+    box-shadow:0 0 26px rgba(91,231,255,.4);
+  }
+  .next.on{display:block}
+  .next:hover{filter:brightness(1.12)}
+
+  /* ============ COMIC ============ */
+  .comic{position:fixed; inset:0; z-index:90; display:grid; place-items:center; background:rgba(3,4,10,.9); backdrop-filter:blur(7px); opacity:0; pointer-events:none; transition:.32s; padding:22px; overflow-y:auto}
+  .comic.on{opacity:1; pointer-events:auto}
+  .frame{
+    width:min(880px,100%); max-height:92vh; overflow-y:auto;
+    background:var(--panel); border:4px solid #000; border-radius:6px;
+    box-shadow:14px 14px 0 rgba(0,0,0,.75), 0 0 70px rgba(91,231,255,.24);
+    transform:scale(.94) rotate(-.6deg); transition:.34s; margin:auto;
+  }
+  .comic.on .frame{transform:none}
+  .frame .strip{display:flex; justify-content:space-between; align-items:center; gap:14px; padding:12px 20px; background:#000; flex-wrap:wrap}
+  .frame .strip .ct{font-family:var(--mono); font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--gold)}
+  .frame .strip .cz{font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase}
+  .frame .art{position:relative; min-height:200px; overflow:hidden; display:grid; place-items:center; padding:34px 26px; border-bottom:4px solid #000}
+  .frame .art .bg{position:absolute; inset:0}
+  .frame .art h3{
+    position:relative; z-index:2; text-align:center; font-size:clamp(26px,5vw,50px);
+    font-weight:900; letter-spacing:-1.5px; text-transform:uppercase; line-height:.95; color:#fff;
+    text-shadow:5px 5px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+  }
+  .frame .body{padding:24px 26px 8px; position:relative}
+  .frame .body::before{content:""; position:absolute; inset:0; pointer-events:none; opacity:.5; background-image:radial-gradient(rgba(0,0,0,.16) 1px, transparent 1.2px); background-size:6px 6px}
+  .cap{position:relative; z-index:2; background:#fffaf0; border:3px solid #000; padding:13px 16px; margin-bottom:13px; font-size:15px; line-height:1.62; box-shadow:5px 5px 0 rgba(0,0,0,.85); font-family:Georgia,serif; clip-path:polygon(0 0,100% 0,100% 88%,95% 100%,0 100%)}
+  .cap b{color:#c1440e}
+  .bubble{position:relative; z-index:2; background:#fff; border:3.5px solid #000; border-radius:22px; padding:13px 17px; margin:0 0 15px auto; max-width:78%; font-size:15px; line-height:1.5; box-shadow:5px 5px 0 rgba(0,0,0,.8); font-family:Georgia,serif}
+  .bubble::after{content:""; position:absolute; left:26px; bottom:-17px; border:9px solid transparent; border-top-color:#fff; filter:drop-shadow(0 3px 0 #000)}
+  .fact{position:relative; z-index:2; margin-top:17px; padding:16px 18px; background:#101820; border:3px solid #000; color:#dbe7ff; box-shadow:6px 6px 0 var(--cyan)}
+  .fact .fh{font-family:var(--mono); font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); margin-bottom:7px}
+  .fact p{font-size:14.5px; line-height:1.65; color:#c3d3f2}
+  .fact b{color:var(--cyan)}
+  .frame .fbtn{display:block; width:calc(100% - 52px); margin:18px 26px 26px; font:inherit; font-family:var(--mono); font-weight:700; font-size:12.5px; letter-spacing:.16em; text-transform:uppercase; background:var(--gold); color:#241a00; border:3px solid #000; border-radius:8px; padding:14px; cursor:pointer; box-shadow:5px 5px 0 #000}
+  .frame .fbtn:hover{transform:translate(-2px,-2px); box-shadow:7px 7px 0 #000}
+
+  /* ============ DRAWER ============ */
+  .scrim{position:fixed; inset:0; background:rgba(2,4,9,.65); z-index:95; opacity:0; pointer-events:none; transition:.3s}
+  .scrim.on{opacity:1; pointer-events:auto}
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(470px,94vw); z-index:96;
+    background:rgba(8,12,26,.98); border-left:1px solid var(--cyan);
+    box-shadow:-30px 0 70px rgba(0,0,0,.7); backdrop-filter:blur(14px);
+    transform:translateX(102%); transition:transform .38s cubic-bezier(.2,.9,.25,1);
+    display:flex; flex-direction:column;
+  }
+  .drawer.open{transform:none}
+  .drawer .dtop{padding:22px 24px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:14px; align-items:flex-start}
+  .drawer h2{font-size:24px; font-weight:900; letter-spacing:-.5px; line-height:1.18; margin-top:9px}
+  .drawer .where{color:var(--cyan); font-size:12.5px; font-family:var(--mono); letter-spacing:.1em; margin-top:7px; text-transform:uppercase}
+  .drawer .dbody{padding:20px 24px 40px; overflow-y:auto; line-height:1.68; font-size:14.5px}
+  .x{background:none; border:1px solid var(--line); color:var(--muted); width:36px; height:36px; border-radius:9px; cursor:pointer; font-size:17px; flex:none}
+  .x:hover{color:var(--ink); border-color:var(--cyan)}
+  .badge{display:inline-block; font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; padding:5px 10px; border-radius:4px; background:var(--gold); color:#241a00}
+  .badge.live{background:var(--green); color:#00331b}
+  .facts{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:18px 0; padding:15px; border:1px solid var(--line); border-radius:11px; background:rgba(91,231,255,.05)}
+  .facts div{text-align:center}
+  .facts b{display:block; font-family:var(--mono); font-size:17px; color:var(--cyan)}
+  .facts span{font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em}
+  .drawer h3{font-family:var(--mono); font-size:10.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin:22px 0 9px}
+  .drawer p{color:#c2d1ee; margin-bottom:12px}
+  .science{border-left:3px solid var(--gold); padding:13px 16px; background:rgba(255,209,102,.08); border-radius:0 9px 9px 0; color:#ffe6bd; font-size:14px}
+  .still{margin-top:16px; padding:13px 16px; border-radius:10px; background:rgba(95,247,165,.08); border:1px solid rgba(95,247,165,.35); font-size:13.5px; color:#b6f5d4}
+
+  /* ============ OVERLAYS ============ */
+  .overlay{position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:radial-gradient(circle at 50% 40%, #0d1730, #04060e 72%); padding:26px; text-align:center; overflow-y:auto}
+  .overlay.off{display:none}
+  .ocard{max-width:820px; margin:auto}
+  .ocard .kick{font-family:var(--mono); font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:var(--cyan); margin-bottom:16px}
+  .ocard h1{font-size:clamp(40px,8vw,88px); font-weight:900; line-height:.86; letter-spacing:-3px; text-transform:uppercase}
+  .ocard h1 span{display:block; color:transparent; -webkit-text-stroke:2.5px var(--gold)}
+  .ocard>p{margin-top:22px; font-size:16px; line-height:1.7; color:#b9c8e8; max-width:64ch; margin-inline:auto}
+  .ocard>p b{color:var(--ink)}
+  .rules{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:12px; margin-top:26px; text-align:left}
+  .rule{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:12px; padding:15px}
+  .rule b{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); margin-bottom:6px}
+  .rule span{font-size:13.5px; color:#a9b8d8; line-height:1.55}
+  .rar-legend{display:flex; gap:9px; flex-wrap:wrap; justify-content:center; margin-top:22px}
+  .rar-legend span{font-family:var(--mono); font-size:10px; letter-spacing:.13em; text-transform:uppercase; padding:7px 12px; border-radius:6px; font-weight:700; border:1px solid}
+  .mappreview{margin-top:24px; text-align:left; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:14px; padding:16px 18px}
+  .mappreview h4{font-family:var(--mono); font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--cyan); margin-bottom:12px}
+  .mappreview ol{list-style:none; display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:7px}
+  .mappreview li{font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; gap:9px; align-items:center; padding:6px 9px; background:rgba(255,255,255,.03); border-radius:7px; border:1px solid transparent}
+  .mappreview li i{width:8px; height:8px; border-radius:50%; background:#2b3760; flex:none}
+  .mappreview li b{color:#c9d6f2; font-weight:600}
+  .mappreview li span{margin-left:auto; color:#5f6d92; font-size:10px}
+  .big{display:inline-block; margin-top:26px; font:inherit; font-family:var(--mono); font-weight:800; font-size:14px; letter-spacing:.18em; text-transform:uppercase; background:var(--gold); color:#241a00; border:0; border-radius:11px; padding:18px 44px; cursor:pointer; box-shadow:0 0 40px rgba(255,209,102,.45)}
+  .big:hover{transform:translateY(-3px)}
+  .big:disabled{opacity:.55; cursor:default; box-shadow:none; transform:none}
+  .big.ghost{background:none; color:var(--muted); border:1px solid var(--line); box-shadow:none; margin-left:12px}
+  .big.ghost:hover{color:var(--ink); border-color:var(--cyan)}
+  .scoreline{display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:14px; margin-top:28px}
+  .sbox{background:rgba(91,231,255,.07); border:1px solid rgba(91,231,255,.3); border-radius:13px; padding:18px 14px}
+  .sbox b{display:block; font-family:var(--mono); font-size:29px; color:var(--cyan); font-weight:800; letter-spacing:-1px}
+  .sbox span{font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.14em}
+  .sbox.gold{background:rgba(255,209,102,.08); border-color:rgba(255,209,102,.35)}
+  .sbox.gold b{color:var(--gold)}
+
+  @media(max-width:900px){
+    .app{grid-template-columns:1fr}
+    .rail{display:none}
+    .readouts{gap:14px}
+    .ro .val{font-size:15px}
+    .brand h1{font-size:14px; white-space:normal}
+    .brand h1 span{display:inline}
+    .big.ghost{margin-left:0; margin-top:12px}
+  }
+</style>
+<link rel="stylesheet" href="kid-mode.css">
+<script src="kid-mode.js"></script>
+</head>
+<body>
+
+<header class="hud">
+  <div class="brand">
+    <div class="kick">2026 NASA Space Apps · Interactive comic</div>
+    <h1>THE DEEP DIVE: <span>Abandoned but not Forgotten</span></h1>
+  </div>
+  <div class="readouts">
+    <div class="ro"><div class="lbl">Depth</div><div class="val" id="hDepth">0 km</div></div>
+    <div class="ro"><div class="lbl">Score</div><div class="val gold" id="hScore">0</div></div>
+    <div class="ro"><div class="lbl">Zone</div><div class="val sm" id="hZone">Surface</div></div>
+    <div class="ro"><div class="lbl">Lives</div><div class="lives" id="hLives"><i></i><i></i><i></i></div></div>
+  </div>
+</header>
+<div class="depthbar"><i id="hBar"></i></div>
+
+<div class="app">
+  <aside class="rail">
+    <h2>Descent map · tap a beacon</h2>
+    <div id="ladder"></div>
+  </aside>
+
+  <main class="stage">
+    <div class="sky">
+      <div class="stars"></div>
+      <div class="glow" id="glow"></div>
+      <div id="ambient"></div>
+    </div>
+
+    <div class="banner">
+      <div class="zt" id="bZone">Zone 01</div>
+      <h2 id="bName">Surface</h2>
+      <div class="zk" id="bFact">everything starts here</div>
+    </div>
+
+    <section class="quiz" id="quiz">
+      <div class="qmeta">
+        <div class="qn" id="qNum">Question 01 / 10</div>
+        <div class="qtopic" id="qTopic">Topic · The challenge</div>
+      </div>
+      <h3 id="qText">—</h3>
+      <div class="typebar">
+        <input id="qInput" type="text" autocomplete="off" spellcheck="false" placeholder="Type your answer, press Enter…">
+        <button id="qSubmit">↵</button>
+        <div class="timer"><i id="qTimerFill"></i></div>
+      </div>
+      <div class="found" id="qFound"></div>
+      <div class="explain" id="qExplain"></div>
+      <button class="next" id="qNext">Continue descent ▼</button>
+    </section>
+  </main>
+</div>
+
+<!-- COMIC -->
+<div class="comic" id="comic">
+  <div class="frame">
+    <div class="strip"><div class="ct" id="cChapter">Chapter</div><div class="cz" id="cZone">Zone</div></div>
+    <div class="art"><div class="bg" id="cBg"></div><h3 id="cTitle">—</h3></div>
+    <div class="body" id="cBody"></div>
+    <button class="fbtn" id="cBtn">Continue descent ▼</button>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true">
+  <div class="dtop">
+    <div>
+      <span class="badge" id="dBadge">Abandoned</span>
+      <h2 id="dTitle">—</h2>
+      <div class="where" id="dWhere">—</div>
+    </div>
+    <button class="x" id="dClose" aria-label="Close">✕</button>
+  </div>
+  <div class="dbody">
+    <div class="facts" id="dFacts"></div>
+    <h3>The story</h3>
+    <div id="dStory"></div>
+    <h3>The science it made possible</h3>
+    <div class="science" id="dScience"></div>
+    <div class="still" id="dStill"></div>
+  </div>
+</aside>
+
+<!-- START -->
+<div class="overlay" id="startScreen">
+  <div class="ocard">
+    <div class="kick">Concept 05 · comic × map × rarity descent</div>
+    <h1>THE DEEP<span>DIVE</span></h1>
+    <p>Since the 1960s NASA has left hardware across the solar system. <b>Type</b> your answers about the machines nobody talks about — <b>the rarer what you write, the deeper you descend</b> — and every zone you cross unlocks a comic chapter telling that hardware's story.</p>
+    <div class="rules">
+      <div class="rule"><b>① Type</b><span id="ruleOne">25 seconds per prompt. Type an answer and press Enter; no options shown.</span></div>
+      <div class="rule"><b>② Descend</b><span>The rarer what you typed, the deeper you fall. Find them all for a full sweep.</span></div>
+      <div class="rule"><b>③ Unlock</b><span>Cross into a new zone and its comic chapter + map beacon open.</span></div>
+      <div class="rule"><b>④ Survive</b><span>Find nothing and you lose a life. Reach the edge for interstellar space.</span></div>
+    </div>
+    <div class="rar-legend" id="rarLegend"></div>
+    <div class="mappreview">
+      <h4>Route · surface to interstellar space</h4>
+      <ol id="mapPreview"></ol>
+    </div>
+    <button class="big" id="startBtn" disabled>Loading archive…</button>
+  </div>
+</div>
+
+<!-- END -->
+<div class="overlay off" id="endScreen">
+  <div class="ocard">
+    <div class="kick" id="endKick">Descent complete</div>
+    <h1 id="endTitle">You went<span>deep</span></h1>
+    <p id="endMsg">—</p>
+    <div class="scoreline" id="endScore"></div>
+    <button class="big" id="againBtn">▼ Dive again</button>
+  </div>
+</div>
+
+<!-- Quiz archive. quiz-data.js is generated from quiz-data.json (sync-quiz.py). -->
+<!-- It is the file:// fallback; on http(s) the page fetches the live JSON. -->
+<script src="quiz-data.js"></script>
+<script>
+/* ==================================================================
+   RARITY — the Krillion mechanic: rarer = deeper
+================================================================== */
+const RARITY = {
+  COMMON:    { depth:4,  score:100,  color:"#8fa6cc", bg:"rgba(143,166,204,.16)", label:"Common" },
+  UNCOMMON:  { depth:8,  score:250,  color:"#5ff7a5", bg:"rgba(95,247,165,.16)",  label:"Uncommon" },
+  RARE:      { depth:13, score:500,  color:"#5be7ff", bg:"rgba(91,231,255,.18)",  label:"Rare" },
+  LEGENDARY: { depth:21, score:1000, color:"#ffd166", bg:"rgba(255,209,102,.2)",  label:"Legendary" }
+};
+
+/* ==================================================================
+   ZONES — thresholds tuned so every chapter unlocks during a perfect run
+================================================================== */
+const ZONES = [
+  { t:"Surface",          km:"0 km",       kmn:0,          at:0,      fact:"everything starts here",
+    glow:"radial-gradient(circle,#8fb6ff,transparent 65%)", amb:["🛰️","🌍"] },
+
+  { t:"Low Earth Orbit",  km:"400 km",     kmn:400,        at:7.5,    fact:"the ISS circles here every 90 minutes",
+    glow:"radial-gradient(circle,#6fb8ff,transparent 65%)", amb:["🛰️","🛰️"] },
+
+  { t:"Van Allen Belts",  km:"60,000 km",  kmn:60000,      at:17.5,   fact:"radiation belts trap charged particles from the Sun",
+    glow:"radial-gradient(circle,#7ce0ff,transparent 65%)", amb:["⚡","🛰️"] },
+
+  { t:"Cislunar Space",   km:"384,400 km", kmn:384400,     at:30,     fact:"the Moon's neighbourhood — nothing but vacuum and history",
+    glow:"radial-gradient(circle,#a8c4ff,transparent 65%)", amb:["🌙","✨"] },
+
+  { t:"Lunar Surface",    km:"384,400 km", kmn:384400,     at:42.5,   fact:"six pieces of hardware still sit exactly where they stopped",
+    glow:"radial-gradient(circle,#9fb6d8,transparent 65%)", amb:["🌑","🪨"],
+    chapter:"Chapter One", title:"The Machines We Left Behind",
+    caps:["<b>Nothing erases them.</b> No wind, no rain, no weather — only the slow grind of micrometeorites across four billion years.","Apollo 11's descent stage still stands at Tranquility Base, engine cold, retroreflector aimed at Earth."],
+    bubble:"Nobody tells you about the ones that stayed.",
+    factBox:{ h:"Still working", p:"The Apollo 11 <b>laser retroreflector</b> is still in service. Astronomers fire a laser at it and time the bounce, measuring the Earth–Moon distance to within a few millimetres." },
+    hw:[
+      { n:"Apollo 11 Descent Stage", y:"1969", status:"live", where:"Sea of Tranquility · Moon",
+        f:[["Jul 1969","Landed"],["2 people","Carried"],["Still there","Status"]],
+        s:["On 20 July 1969 the lunar module Eagle touched down with under 30 seconds of fuel left. When the crew lifted off two days later, everything they did not need stayed behind — engine, tanks and landing legs.","It is the first human-made object deliberately abandoned on another world, and it sits undisturbed because the Moon has no weather to move it."],
+        sci:"Its laser retroreflector still bounces beams from Earth, letting astronomers measure the Earth–Moon distance to a few millimetres and test general relativity.",
+        end:"Still working: used in ranging experiments to this day." },
+      { n:"Surveyor 7", y:"1968", status:"gone", where:"Tycho highlands · Moon",
+        f:[["Jan 1968","Landed"],["7th of 7","Series"],["Surface","Studied"]],
+        s:["The last of seven robotic scouts sent to answer one terrifying question: is the lunar soil solid enough to land a crewed craft on, or will it swallow them?","It landed near Tycho's rim, tilted about 15°, and spent two weeks photographing terrain and digging with its scoop."],
+        sci:"Surveyor proved the soil could bear weight and supplied the surface pictures Apollo needed. Without it, Apollo would have been a blind gamble.",
+        end:"Silent since 1968 — its images still teach geologists today." },
+      { n:"Apollo 15 Rover", y:"1971", status:"gone", where:"Hadley–Apennine · Moon",
+        f:[["1971","Deployed"],["27.9 km","Driven"],["3","Left on Moon"]],
+        s:["Three battery-powered buggies — Apollo 15, 16 and 17 — are parked where their crews finished with them.","Apollo 15's crew drove 27.9 km and hauled 77 kg of samples back to Earth."],
+        sci:"The rovers turned a landing site into a field expedition. Apollo 15 found the famous “Genesis Rock,” an ancient fragment of the Moon's original crust.",
+        end:"All three rovers remain — tyre tracks preserved for millions of years." },
+      { n:"ALSEP Array", y:"1969–1977", status:"gone", where:"Six sites across the Moon",
+        f:[["5 stations","Built"],["1977","Powered off"],["Data","Returned"]],
+        s:["From Apollo 12 onward each crew deployed seismometers, heat-flow probes and solar wind detectors, then walked away and left them working unattended.","In 1977 NASA sent the switch-off command — the power was finite and the stations had already outlived their design life by years."],
+        sci:"The Apollo seismometers detected moonquakes and revealed the Moon has a small, solid core. Heat-flow probes showed the interior still leaks warmth from its formation.",
+        end:"One exception: the laser reflectors are unpowered but still reflecting." },
+      { n:"Odysseus IM-1", y:"2024", status:"gone", where:"Near Malapert A · lunar south",
+        f:[["Feb 2024","Landed"],["Tipped","Over"],["6 of 7","Instruments"]],
+        s:["The first US spacecraft to land on the Moon since 1972 touched down in February 2024 — then tipped onto its side because a leg caught the surface.","It was never meant to survive long. It was meant to prove a new model: commercial landers carrying NASA science to the Moon."],
+        sci:"Even on its side it returned data from six instruments, including surface and plasma measurements near the lunar south pole — where Artemis crews hope to land.",
+        end:"Silent now, but it opened the door for the CLPS commercial lunar programme." },
+      { n:"LCROSS Impactor", y:"2009", status:"gone", where:"Cabeus crater · lunar south",
+        f:[["Oct 2009","Impacted"],["9,000 km/h","Speed"],["Water","Confirmed"]],
+        s:["This was no accident. LCROSS slammed its rocket stage into a permanently shadowed crater at 9,000 km/h, then flew through the debris plume to analyse it.","The observing spacecraft followed behind, gathering spectra before looping away."],
+        sci:"The impact confirmed water ice in permanently shadowed craters — a resource future astronauts could turn into drinking water and rocket propellant.",
+        end:"The impactor's debris is now spread across the floor of Cabeus crater." }
+    ]},
+
+  { t:"Solar Orbit",     km:"150M km",    kmn:1.5e8,      at:55,     fact:"Kepler trails Earth around the Sun, still holding position",
+    glow:"radial-gradient(circle,#ffd98a,transparent 65%)", amb:["🔭","⭐"],
+    chapter:"Chapter Two", title:"A Telescope That Refused to Fall Behind",
+    caps:["<b>Kepler did not fall apart — it was retired.</b> After nine years staring at one patch of 150,000 stars, its reaction wheels failed, and engineers improvised a second life using sunlight as a stabiliser."],
+    bubble:"I found more planets than there are words for them.",
+    factBox:{ h:"The discovery", p:"Kepler found <b>more than 2,600 confirmed exoplanets</b> and proved most stars in the galaxy have planets — a statistic humanity simply did not have before it launched." },
+    hw:[
+      { n:"Kepler Space Telescope", y:"2009–2018", status:"gone", where:"Earth-trailing solar orbit",
+        f:[["2,600+","Exoplanets"],["9 yrs","Ran"],["2018","Retired"]],
+        s:["Kepler watched one patch of sky for years, waiting for the tiny dip in brightness when a planet crosses its star.","When its wheels failed it was reborn as K2, then retired in 2018 and left in an orbit trailing Earth around the Sun."],
+        sci:"Kepler found more than 2,600 confirmed exoplanets and showed that most stars have planets — statistics we simply did not have before.",
+        end:"Silent since 2018, drifting behind Earth." }
+    ]},
+
+  { t:"Martian Transfer", km:"200M km",   kmn:2e8,        at:67.5,   fact:"cruise stages jettisoned — nothing but radio silence between worlds",
+    glow:"radial-gradient(circle,#ff9a5c,transparent 65%)", amb:["🚀","✨"] },
+
+  { t:"Martian Surface",  km:"225M km",   kmn:2.25e8,     at:77.5,   fact:"six machines still lie exactly where they stopped talking",
+    glow:"radial-gradient(circle,#ff7a4d,transparent 65%)", amb:["🔴","🪨"],
+    chapter:"Chapter Three", title:"My Battery Is Low",
+    caps:["<b>Fifteen years of dust.</b> Opportunity was built for ninety days and kept driving for fifteen, because on Mars there is no rain to wash a panel clean and nobody to wipe the lens.","When a planet-wide dust storm blocked the Sun in June 2018, the battery drained — and a rover's last words were never meant for us."],
+    bubble:"My battery is low… and it's getting dark.",
+    factBox:{ h:"Why it matters", p:"The hardware is preserved by the environment that killed it. On the Moon and Mars, abandonment is permanent — <b>which is what makes these sites worth telling stories about.</b>" },
+    hw:[
+      { n:"Sojourner", y:"1997", status:"gone", where:"Ares Vallis · Mars",
+        f:[["650 g","Weight"],["65 cm","Long"],["1997","Died"]],
+        s:["Sojourner was the size of a microwave oven and the first wheeled vehicle to drive on another planet. It rolled off its lander in July 1997 and spent its whole life within a few metres of it.","It survived three times longer than planned, then went silent when its battery could no longer survive the freezing night."],
+        sci:"Its spectrometer analysed flood-plain rocks and confirmed they had been shaped and transported by water — the proof of concept for every rover that followed.",
+        end:"It sits where it stopped, wheels still on the ground." },
+      { n:"Spirit", y:"2004–2011", status:"gone", where:"Gusev Crater · Mars",
+        f:[["6 yrs","Operated"],["22 km","Distance"],["Silica","Discovery"]],
+        s:["Spirit landed in January 2004 for a 90-day mission and kept going for six years, climbing the Columbia Hills when its original plan stalled in soft soil.","In 2009 one wheel jammed — so engineers dragged it backwards, using the stuck wheel as a plough, and kept driving."],
+        sci:"That improvised plough uncovered pure silica left by hot springs or steam vents — strong evidence Gusev Crater once hosted warm, water-driven chemistry.",
+        end:"Wheels stuck where it went silent in 2010; declared dead in 2011." },
+      { n:"Opportunity", y:"2004–2019", status:"gone", where:"Meridiani Planum · Mars",
+        f:[["45 km","Distance"],["15 yrs","Ran"],["Jun 2018","Final signal"]],
+        s:["Opportunity was built for 90 days. It lasted almost fifteen years and drove 45 kilometres.","It ended in June 2018 when a planet-wide dust storm blotted out the Sun. Its final message was paraphrased by a NASA scientist as: “My battery is low and it's getting dark.”"],
+        sci:"It found grey hematite “blueberries” — spheres that only form in liquid water — plus minerals from an acidic ancient sea. Mars was once wet, and Opportunity proved it on the ground.",
+        end:"Silent since June 2018. Mission declared over in February 2019." },
+      { n:"InSight", y:"2018–2022", status:"gone", where:"Elysium Planitia · Mars",
+        f:[["1,300+","Marsquakes"],["4 yrs","Ran"],["2022","Died"]],
+        s:["InSight was not a rover — it never moved. It planted a seismometer under a shield and sat perfectly still, listening to the planet's heartbeat.","Dust slowly coated its solar panels until it could no longer charge. NASA held a final listening session in December 2022 before it went dark."],
+        sci:"InSight recorded more than 1,300 marsquakes, mapped the size of Mars's core and showed the planet is more geologically alive than anyone expected.",
+        end:"The seismometer stays where it was placed — the first geophysical station on another planet." },
+      { n:"Phoenix", y:"2008", status:"gone", where:"Vastitas Borealis · Mars",
+        f:[["May 2008","Landed"],["Ice","Found"],["Nov 2008","Died"]],
+        s:["Phoenix was built to survive one Martian winter at the north pole. It scraped away soil with a robotic arm and found white ice directly underneath.","When polar darkness arrived in November 2008 the solar panels could not recharge the battery. It fell silent exactly as predicted."],
+        sci:"Phoenix confirmed water ice at high latitude and detected perchlorates — salts that shape both Mars science and the safety of future human crews.",
+        end:"Probably still there under a coating of frost and dust." },
+      { n:"Viking 1", y:"1976–1982", status:"gone", where:"Chryse Planitia · Mars",
+        f:[["1976","Landed"],["6 yrs","Operated"],["1st","US landing"]],
+        s:["Viking 1 made the first successful US landing on Mars on 20 July 1976 — seven years to the day after Apollo 11 touched the Moon.","It worked for six years and sent back the first colour panorama of the Martian surface."],
+        sci:"Its biology experiments produced ambiguous results scientists still debate today, and its soil chemistry revealed perchlorates that later missions confirmed.",
+        end:"Standing on Chryse Planitia since 1976." }
+    ]},
+
+  { t:"Asteroid Belt",    km:"400M km",   kmn:4e8,        at:87.5,   fact:"millions of rocks — and almost entirely empty space",
+    glow:"radial-gradient(circle,#c9a06a,transparent 65%)", amb:["☄️","🪨"] },
+
+  { t:"Jovian System",    km:"778M km",   kmn:7.78e8,     at:97.5,   fact:"Galileo burned up here by choice, to protect a moon we haven't landed on",
+    glow:"radial-gradient(circle,#e8b872,transparent 65%)", amb:["🪐","✨"],
+    chapter:"Chapter Four", title:"Destroyed on Purpose",
+    caps:["<b>Not every loss is an accident.</b> When Galileo's fuel ran out in 2003, NASA chose to fly it into Jupiter's atmosphere rather than let it drift toward Europa — a moon that might harbour life.","It burned up on 21 September 2003 at enormous speed. The destruction was the plan."],
+    bubble:"I burned so Europa could stay clean.",
+    factBox:{ h:"The science", p:"Galileo produced the first strong evidence for a salty liquid ocean beneath Europa's ice — the discovery that directly drives today's <b>Europa Clipper</b> mission." },
+    hw:[
+      { n:"Galileo", y:"1989–2003", status:"gone", where:"Jupiter · deep space",
+        f:[["14 yrs","Mission"],["2003","Destroyed"],["Europa","Ocean found"]],
+        s:["Galileo was the first spacecraft to orbit Jupiter. When its fuel ran out, NASA flew it into Jupiter's atmosphere rather than let it drift toward Europa.","It burned up on 21 September 2003 at enormous speed — deliberately."],
+        sci:"Galileo produced the first strong evidence for a salty liquid ocean beneath Europa's ice, directly driving today's Europa Clipper mission.",
+        end:"Gone by design, to protect a world we have not even visited." }
+    ]},
+
+  { t:"Saturnian System", km:"1.4B km",   kmn:1.4e9,      at:107.5,  fact:"Cassini's Grand Finale — 22 orbits between planet and rings",
+    glow:"radial-gradient(circle,#e8d5a8,transparent 65%)", amb:["🪐","💫"],
+    chapter:"Chapter Five", title:"The Grand Finale",
+    caps:["<b>Cassini spent twenty years at Saturn</b> and discovered that Enceladus shoots ocean water into space. With fuel running out, engineers flew it 22 times through the gap between the planet and its rings.","On 15 September 2017 it was deliberately flown into Saturn's atmosphere — to avoid ever contaminating those moons."],
+    bubble:"I gave myself to the planet so the ocean could stay untouched.",
+    factBox:{ h:"The science", p:"Cassini revealed a global liquid ocean under Enceladus and a methane sea on Titan — <b>two of the most promising places to look for life beyond Earth.</b> Its data is still being re-analysed today." },
+    hw:[
+      { n:"Cassini–Huygens", y:"1997–2017", status:"gone", where:"Saturn · deep space",
+        f:[["22 yrs","Mission"],["144","Final orbits"],["Sep 2017","End"]],
+        s:["Cassini spent 20 years at Saturn. With fuel running out, engineers flew it through the gap between planet and rings 22 times, then destroyed it in Saturn's atmosphere on 15 September 2017.","The reason was protection: Enceladus has an ocean, and Cassini must never be allowed to crash into it."],
+        sci:"Cassini found a global liquid ocean beneath Enceladus's ice and a methane sea on Titan — two of the most promising places to look for life beyond Earth.",
+        end:"Destroyed by design. Its data is still being re-analysed today." }
+    ]},
+
+  { t:"Kuiper Belt",      km:"4.5B km",   kmn:4.5e9,      at:115,    fact:"icy bodies beyond Neptune — the solar system's frozen outskirts",
+    glow:"radial-gradient(circle,#8fb4e8,transparent 65%)", amb:["❄️","☄️"] },
+
+  { t:"Heliopause",       km:"18B km",    kmn:1.8e10,     at:121.25, fact:"the Sun's wind stops here and the interstellar medium begins",
+    glow:"radial-gradient(circle,#b48bff,transparent 65%)", amb:["🌌","✨"],
+    chapter:"Chapter Six", title:"Still Talking",
+    caps:["<b>Not everything is abandoned.</b> Launched in 1977, both Voyagers are still communicating from interstellar space — the most distant human-made objects in existence.","Each carries the Golden Record: sounds and images of Earth, in case anything ever finds them."],
+    bubble:"Our signals take about twenty-two hours to reach you.",
+    factBox:{ h:"The exception", p:"Voyagers confirmed ocean worlds at Jupiter and Saturn and found active volcanoes on Io. When they finally fall silent, <b>they will keep travelling — the longest-lasting objects humanity has made.</b>" },
+    hw:[
+      { n:"Voyager 1", y:"1977–", status:"live", where:"Interstellar space · ~24B km",
+        f:[["1977","Launched"],["Farthest","Human object"],["Active","Status"]],
+        s:["Voyager 1 is the most distant human-made object in existence, still returning engineering data from interstellar space.","It crossed the heliopause — the boundary where the Sun's wind gives up — and never looked back."],
+        sci:"Its instruments measure the boundary where the solar wind meets the interstellar medium — a region no other spacecraft has visited.",
+        end:"STILL TALKING. Signal delay is roughly 22 hours." }
+    ]},
+
+  { t:"Interstellar Space", km:"24B km+", kmn:2.4e10,     at:125,    fact:"the longest-lasting objects humanity has ever made",
+    glow:"radial-gradient(circle,#d0a8ff,transparent 65%)", amb:["🌌","⭐","✨"],
+    chapter:"Final Chapter", title:"The Edge of Everything",
+    caps:["<b>You made it.</b> Past the planets, past the asteroid belt, past the boundary where the Sun's own wind gives up.","Everything behind you is still there — every rover, every lander, every descent stage, waiting exactly where it stopped."],
+    bubble:"Nothing out here forgets.",
+    factBox:{ h:"Why this matters", p:"These machines are monuments to human exploration. Telling their stories — accurately, and with feeling — is how the next generation inherits the science they made possible." },
+    hw:[
+      { n:"Voyager 2", y:"1977–", status:"live", where:"Interstellar space · ~20B km",
+        f:[["1977","Launched"],["All 4","Planets"],["Active","Status"]],
+        s:["Voyager 2 is the only spacecraft to have visited Uranus and Neptune, and the second to cross into interstellar space.","It carries the Golden Record — sounds and images of Earth, in case anything ever finds it."],
+        sci:"It returned the only close-up images of Uranus and Neptune ever taken, revealing ice giants that models had not predicted.",
+        end:"STILL TALKING. It will outlast everyone who built it." }
+    ]}
+];
+
+/* ==================================================================
+   LEGACY multiple-choice prototype — retained for reference, unused.
+   The typing-mode quiz below is driven entirely by quiz-data.json.
+   QUESTIONS — ordered to match the descent; the CORRECT answer's
+   rarity decides how far you fall. MAX_DEPTH = sum of correct rarities.
+================================================================== */
+const QUESTIONS_LEGACY = [
+  { topic:"The challenge", q:"Since the 1960s NASA has left hardware across the solar system. Why is so much of it still sitting there, intact?",
+    o:[{t:"There is no atmosphere, wind or liquid water to move it",r:"RARE",c:1},
+       {t:"NASA seals every lander in a protective coating",r:"COMMON"},
+       {t:"The gravity pins everything to the ground",r:"LEGENDARY"},
+       {t:"Micrometeorites grind it all flat instead",r:"UNCOMMON"}],
+    e:"The Moon has <b>no atmosphere, no wind and no liquid water</b>. Nothing rusts, nothing blows away, nothing weathers — only the slow rain of micrometeorites, which takes millions of years to make a dent." },
+
+  { topic:"Cislunar space", q:"Which discovery changed where NASA now plans to land crews on the Moon?",
+    o:[{t:"A magnetic field at the lunar south pole",r:"COMMON"},
+       {t:"Lava tubes large enough to build inside",r:"UNCOMMON"},
+       {t:"Water ice in permanently shadowed craters",r:"LEGENDARY",c:1},
+       {t:"A perfectly flat plain with no boulders",r:"COMMON"}],
+    e:"In 2009 the <b>LCROSS impactor</b> deliberately slammed into a permanently shadowed crater and found water ice. That single result reshaped Artemis planning — water can become drinking water and rocket propellant." },
+
+  { topic:"Lunar surface", q:"Apollo 11's descent stage still sits at Tranquility Base. Which part of it is still actively used for science?",
+    o:[{t:"The descent engine",r:"COMMON"},
+       {t:"The landing legs",r:"COMMON"},
+       {t:"The laser retroreflector",r:"RARE",c:1},
+       {t:"The fuel tanks",r:"UNCOMMON"}],
+    e:"The <b>laser retroreflector</b> is a mirror array aimed at Earth. Astronomers fire lasers at it and time the bounce, measuring the Earth–Moon distance to a few millimetres — a test of general relativity still running after 50+ years." },
+
+  { topic:"Lunar surface", q:"Apollo 15, 16 and 17 each left a rover parked on the Moon. What powered them?",
+    o:[{t:"Rechargeable zinc-silver oxide batteries",r:"COMMON",c:1},
+       {t:"Solar panels",r:"UNCOMMON"},
+       {t:"Petrol engines",r:"COMMON"},
+       {t:"Radioisotope generators",r:"LEGENDARY"}],
+    e:"The Lunar Roving Vehicle ran on <b>five rechargeable zinc-silver oxide batteries</b>. No engine, no solar — just batteries, a wiring loom and four wire-mesh wheels." },
+
+  { topic:"Solar orbit", q:"How many confirmed exoplanets did the Kepler telescope find before it was retired in 2018?",
+    o:[{t:"About 400",r:"UNCOMMON"},
+       {t:"More than 2,600",r:"RARE",c:1},
+       {t:"Exactly 42",r:"COMMON"},
+       {t:"None — the mission failed",r:"COMMON"}],
+    e:"Kepler confirmed <b>more than 2,600 exoplanets</b> and showed most stars in the galaxy have planets — a statistic we simply did not have before it launched in 2009." },
+
+  { topic:"Martian transfer", q:"Just before a Mars orbiter reaches the planet, what happens to the cruise stage that carried it from Earth?",
+    o:[{t:"It is jettisoned and left drifting in solar orbit",r:"UNCOMMON",c:1},
+       {t:"It lands alongside the lander",r:"COMMON"},
+       {t:"It returns to Earth for reuse",r:"LEGENDARY"},
+       {t:"It is refuelled by a service spacecraft",r:"COMMON"}],
+    e:"The cruise stage is <b>thrown away</b> — it has done its job. Like everything else in this challenge, it is abandoned between worlds and left to circle the Sun forever." },
+
+  { topic:"Mars surface", q:"Opportunity found thousands of small grey spheres scattered across Meridiani Planum. What are they?",
+    o:[{t:"Wind-blown dust balls",r:"COMMON"},
+       {t:"Meteorite fragments",r:"UNCOMMON"},
+       {t:"Hematite “blueberries” that form in water",r:"RARE",c:1},
+       {t:"Volcanic pebbles",r:"COMMON"}],
+    e:"They are <b>hematite concretions</b> — and hematite only precipitates from water. Thousands of them meant Meridiani Planum had once been covered by liquid water." },
+
+  { topic:"Jovian system", q:"Why was Galileo deliberately crashed into Jupiter in 2003?",
+    o:[{t:"It had malfunctioned and could not be saved",r:"COMMON"},
+       {t:"Its fuel ran out and NASA chose to protect Europa",r:"LEGENDARY",c:1},
+       {t:"To sample Jupiter's upper atmosphere",r:"UNCOMMON"},
+       {t:"It collided with an asteroid",r:"COMMON"}],
+    e:"With no fuel left, Galileo would have drifted unpredictably toward <b>Europa</b> — a moon with a likely ocean. NASA destroyed it rather than risk contaminating a world we haven't even landed on." },
+
+  { topic:"Saturnian system", q:"How did the Cassini mission end in September 2017?",
+    o:[{t:"It ran out of power and stayed in orbit",r:"COMMON"},
+       {t:"It crashed into Enceladus",r:"COMMON"},
+       {t:"It returned to Earth with samples",r:"LEGENDARY"},
+       {t:"It was flown deliberately into Saturn's atmosphere",r:"RARE",c:1}],
+    e:"The <b>Grand Finale</b>: 22 dives through the gap between Saturn and its rings, then a deliberate plunge into the atmosphere on 15 September 2017 — so it could never contaminate Enceladus or Titan." },
+
+  { topic:"Heliopause", q:"Voyager 1 is currently travelling through which region?",
+    o:[{t:"Low Earth orbit",r:"COMMON"},
+       {t:"The asteroid belt",r:"COMMON"},
+       {t:"Orbiting Jupiter",r:"COMMON"},
+       {t:"Interstellar space",r:"UNCOMMON",c:1}],
+    e:"Voyager 1 crossed the <b>heliopause</b> into interstellar space and is the most distant human-made object in existence. Its signal takes roughly 22 hours to reach us." }
+];
+
+/* ==================================================================
+   QUIZ DATABASE — typing mode (Krillion-style)
+   quiz-data.json is the single source of truth. quiz-data.js is a
+   generated shim (python sync-quiz.py) so double-clicking the page
+   over file:// still works: browsers block fetch() of local JSON.
+   On http(s) the live JSON is fetched at boot and overrides the shim.
+
+   QUIZ_POOL holds the WHOLE archive in canonical JSON order (q01..q20).
+   QUESTIONS holds only the ROUND_SIZE prompts drawn for the CURRENT dive;
+   the engine reads QUESTIONS only. Both arrays share the same question
+   objects, and QUESTIONS is mutated in place so window.__T.QUESTIONS stays
+   live across dives. q.zone is descriptive metadata, not display order.
+   r = rarity 1-99, low = common.
+   depth tiers: r<=20 ->4 | <=40 ->8 | <=60 ->13 | <=80 ->18 | >80 ->25
+   =================================================================== */
+const ROUND_SIZE = 10;      /* prompts per dive, drawn from the whole bank */
+const QUESTIONS = [];
+const QUIZ_POOL = [];
+const DEPTH_T = r => r<=20?4 : r<=40?8 : r<=60?13 : r<=80?18 : 25;
+let MAX_DEPTH = 0;
+let QUIZ_SOURCE = 'quiz-data.js (bundled fallback)';
+/* ?ordered disables shuffling for judging, screenshots and repeatable tests;
+   it then draws the first ROUND_SIZE questions in canonical q01.. order. */
+let SHUFFLE = !new URLSearchParams(location.search).has('ordered');
+
+/* Fisher-Yates over a copy of the ENTIRE bank, then keep the first
+   ROUND_SIZE as this dive's round and swap them into QUESTIONS.
+   MAX_DEPTH MUST be recomputed from the selected round, not the whole
+   bank: it is the ceiling for the depth bar / "perfect descent" check,
+   and summing all 20 questions would make 100% unreachable. */
+function newRound(){
+  const a = QUIZ_POOL.slice();
+  if(SHUFFLE){
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+  }
+  const round = a.slice(0, ROUND_SIZE);
+  QUESTIONS.length = 0;
+  round.forEach(q => QUESTIONS.push(q));
+  MAX_DEPTH = QUESTIONS.reduce((n,q)=>
+    n + Math.max(...q.answers.map(ans=>DEPTH_T(ans.rarity))), 0);
+  return QUESTIONS.length;
+}
+
+/* Install a parsed quiz-data.json document. MAX_DEPTH is computed inside
+   newRound(), AFTER the questions exist. The old code reduced an empty
+   array, so the descent was permanently clamped to depth 0. */
+function installQuiz(data, source){
+  if(!data || !Array.isArray(data.questions) || !data.questions.length) return 0;
+  const qs = data.questions.filter(q => q && Array.isArray(q.answers) && q.answers.length);
+  if(!qs.length) return 0;
+  QUIZ_POOL.length = 0;
+  qs.forEach(q => QUIZ_POOL.push(q));
+  QUIZ_SOURCE = source || QUIZ_SOURCE;
+  return newRound();
+}
+
+/* Synchronous fallback: quiz-data.js has already run at this point. */
+installQuiz(window.QUIZ_DATA, 'quiz-data.js (bundled fallback)');
+
+const S = { zi:0, depth:0, score:0, qi:0, lives:3, seen:new Set([0]), answered:false, over:false, _newly:[], found:[], time:25, locked:false, timer:null };
+const $ = id => document.getElementById(id);
+const ladder=$('ladder'), ambient=$('ambient');
+
+/* ---------- rarity legend ---------- */
+$('rarLegend').innerHTML = [
+  ['COMMON','≤20',4,'#8fa6cc','rgba(143,166,204,.16)'],
+  ['UNCOMMON','21–40',8,'#5ff7a5','rgba(95,247,165,.16)'],
+  ['RARE','41–60',13,'#5be7ff','rgba(91,231,255,.18)'],
+  ['EPIC','61–80',18,'#a78bfa','rgba(167,139,250,.2)'],
+  ['LEGENDARY','81–99',25,'#ffd166','rgba(255,209,102,.2)']
+].map(t=>`<span style="background:${t[4]}; color:${t[3]}; border-color:${t[3]}">${t[0]} · rarity ${t[1]} · +${t[2]} depth</span>`).join('');
+
+/* ---------- start-screen route preview ---------- */
+$('mapPreview').innerHTML = ZONES.map((z,i)=>
+  `<li><i style="background:${z.chapter?'#ffd166':'#2b3760'}"></i><b>${String(i+1).padStart(2,'0')} ${z.t}</b><span>${z.km}</span></li>`
+).join('');
+
+/* ---------- zone lookup ---------- */
+function zoneForDepth(d){
+  let idx = 0;
+  for(let i=0;i<ZONES.length;i++){ if(d >= ZONES[i].at) idx = i; }
+  return idx;
+}
+
+/* ---------- distance formatting (interpolated between zones) ---------- */
+function fmtKm(d){
+  /* Always report the distance of the zone you are actually in.
+     Interpolating across huge gaps (Moon -> Solar Orbit, Kuiper ->
+     Heliopause) prints numbers that contradict the zone banner, and
+     accuracy is explicitly graded in this challenge. Fine-grained
+     progress is carried by the depth bar instead. */
+  let i = 0;
+  for(let k=0;k<ZONES.length;k++){ if(d >= ZONES[k].at) i = k; }
+  return ZONES[i].km;
+}
+
+/* ---------- ladder / map ---------- */
+function renderLadder(){
+  ladder.innerHTML = ZONES.map((z,i)=>{
+    const seen = S.seen.has(i), cur = i === S.zi;
+    const hw = z.hw || [];
+    const beacons = hw.map((h,j)=>
+      `<button class="beacon ${seen?'':'locked'}" data-z="${i}" data-j="${j}" ${seen?'':'disabled'}>${h.n.split(' ')[0]}</button>`
+    ).join('');
+    return `<div class="zone ${seen?'seen':''} ${cur?'cur':''}">
+      <span class="knob"></span>
+      <div class="zn">${z.t}</div>
+      <div class="zk">${z.km}</div>
+      ${hw.length?`<div class="beacons">${beacons}</div>`:''}
+    </div>`;
+  }).join('');
+}
+ladder.addEventListener('click', e=>{
+  const b = e.target.closest('.beacon');
+  if(!b || b.disabled) return;
+  openDrawer(ZONES[+b.dataset.z].hw[+b.dataset.j]);
+});
+
+/* ---------- ambient ---------- */
+function renderAmbient(z){
+  ambient.innerHTML = '';
+  const items = z.amb || ['✨'];
+  for(let i=0;i<9;i++){
+    const s = document.createElement('div');
+    s.className='amb';
+    s.textContent = items[i % items.length];
+    s.style.left = (4 + Math.random()*92) + '%';
+    s.style.animationDuration = (16 + Math.random()*22) + 's';
+    s.style.animationDelay = (-Math.random()*30) + 's';
+    s.style.fontSize = (14 + Math.random()*22) + 'px';
+    s.style.opacity = .25 + Math.random()*.4;
+    ambient.appendChild(s);
+  }
+}
+
+/* ---------- HUD / banner ---------- */
+function renderHUD(){
+  $('hDepth').textContent = fmtKm(S.depth);
+  $('hScore').textContent = S.score.toLocaleString();
+  $('hZone').textContent = ZONES[S.zi].t;
+  $('hBar').style.width = (S.depth / MAX_DEPTH * 100) + '%';
+  $('hLives').innerHTML = [0,1,2].map(i=>`<i class="${i<S.lives?'':'off'}"></i>`).join('');
+}
+function renderBanner(){
+  const z = ZONES[S.zi];
+  $('bZone').textContent = 'Zone ' + String(S.zi+1).padStart(2,'0') + ' / ' + ZONES.length;
+  $('bName').textContent = z.t;
+  $('bFact').textContent = z.fact;
+  $('glow').style.background = z.glow;
+}
+
+/* ---------- quiz ---------- */
+function renderQuestion(preview){
+  const q = QUESTIONS[S.qi];
+  $('qNum').textContent = `Prompt ${String(S.qi+1).padStart(2,'0')} / ${QUESTIONS.length}`;
+  $('qTopic').textContent = 'Topic · ' + q.topic;
+  $('qText').textContent = q.prompt;
+  $('qExplain').classList.remove('on');
+  $('qNext').classList.remove('on');
+  $('qNext').textContent = 'Continue descent ▼';
+  $('qFound').innerHTML = '';
+  S.answered = false; S.found = []; S.time = q.time || 25; S.locked = false;
+
+  const inp = $('qInput'), btn = $('qSubmit');
+  inp.disabled = !!preview; btn.disabled = !!preview; inp.value = '';
+  inp.placeholder = 'Type your answer, press Enter…';
+  $('qTimerFill').style.width = '100%';
+  $('qTimerFill').classList.remove('low');
+  if(preview) return;           /* no countdown behind the start screen */
+  inp.focus();
+  startTimer();
+}
+
+($('qOpts')||{addEventListener(){}}).addEventListener('click', e=>{
+  const btn = e.target.closest('.opt');
+  if(!btn || S.answered || S.over) return;
+  S.answered = true;
+  const q = QUESTIONS[S.qi];
+  const pick = q.o[+btn.dataset.i];
+  const r = RARITY[pick.r];
+  const all = [...$('qOpts').children];
+  all.forEach(b=>b.disabled=true);
+
+  if(pick.c){
+    btn.classList.add('correct');
+    all.forEach((b,i)=>{ if(i !== +btn.dataset.i) b.classList.add('dim'); });
+    S.score += r.score;
+    const before = S.zi;
+    S.depth = Math.min(MAX_DEPTH, S.depth + r.depth);
+    S.zi = zoneForDepth(S.depth);
+
+    S._newly = [];
+    for(let i=before+1;i<=S.zi;i++){ if(!S.seen.has(i)){ S.seen.add(i); S._newly.push(i); } }
+
+    $('qExplain').innerHTML = q.e +
+      `<br><br><span class="gain">▲ +${r.depth} depth · +${r.score} pts · now at ${ZONES[S.zi].t} (${fmtKm(S.depth)})</span>`;
+    $('qExplain').classList.add('on');
+    $('qNext').classList.add('on');
+    renderHUD(); renderBanner(); renderAmbient(ZONES[S.zi]); renderLadder();
+  } else {
+    btn.classList.add('wrong');
+    all.forEach((b,i)=>{
+      if(q.o[i].c) b.classList.add('correct');
+      else if(i !== +btn.dataset.i) b.classList.add('dim');
+    });
+    S.lives--;
+    S._newly = [];
+    $('qExplain').innerHTML = `<b>Not quite.</b> ${q.e}` +
+      `<br><br><span class="gain" style="color:#ff6b6b">♥ Lost a life · ${S.lives} remaining · no depth gained</span>`;
+    $('qExplain').classList.add('on');
+    $('qNext').classList.add('on');
+    if(S.lives<=0) $('qNext').textContent = 'End descent ■';
+    renderHUD();
+  }
+});
+
+/* ---------- typing engine (Krillion-style) ---------- */
+function norm(s){
+  return (s||'').toLowerCase()
+    .replace(/[^a-z0-9\s-]/g,' ')
+    .replace(/\b(a|an|the|of|on|in|at|to|my|it|is|and)\b/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+/* two-way substring match so "apollo" hits "Apollo 11 descent stage"
+   and "descent stage" also hits it */
+function findAnswer(raw){
+  const n = norm(raw);
+  if(n.length < 2) return null;
+  const q = QUESTIONS[S.qi];
+  for(let i=0;i<q.answers.length;i++){
+    const a = q.answers[i];
+    if(S.found.indexOf(a.display) !== -1) continue;
+    const hit = a.match.some(alias=>{
+      const al = norm(alias);
+      if(!al) return false;
+      /* Two-letter answers (Io) are real hardware names. Allow them, but
+         only on an exact alias hit. Short aliases in general (lro, rtg,
+         ds1, io) must match as whole words, or "mission" / "ion" would
+         land Io and "controls" would land CSM. */
+      if(n.length < 3) return al === n;
+      if(al.length < 4){
+        return n === al ||
+               n.indexOf(al + ' ') === 0 ||
+               n.lastIndexOf(' ' + al) === n.length - al.length - 1 ||
+               n.indexOf(' ' + al + ' ') !== -1;
+      }
+      return n.indexOf(al) !== -1 || al.indexOf(n) !== -1;
+    });
+    if(hit) return a;
+  }
+  return null;
+}
+function submitAnswer(){
+  if(S.locked || S.over) return;
+  const inp = $('qInput');
+  const raw = inp.value;
+  if(!norm(raw)) return;
+  const q = QUESTIONS[S.qi];
+  const a = findAnswer(raw);
+  if(!a){
+    inp.value = '';
+    $('qExplain').innerHTML = '<b>Not in the archive.</b> Try a more specific name — mission, lander or instrument.';
+    $('qExplain').classList.add('on');
+    return;
+  }
+  const depth = DEPTH_T(a.rarity);
+  S.found.push(a.display);
+  S.score += depth * 10;
+  const before = S.zi;
+  S.depth = Math.min(MAX_DEPTH, S.depth + depth);
+  S.zi = zoneForDepth(S.depth);
+  S._newly = [];
+  for(let i=before+1;i<=S.zi;i++){ if(!S.seen.has(i)){ S.seen.add(i); S._newly.push(i); } }
+  const tier = a.rarity<=20?'COMMON' : a.rarity<=40?'UNCOMMON' : a.rarity<=60?'RARE' : a.rarity<=80?'EPIC':'LEGENDARY';
+  const chip = document.createElement('span');
+  chip.className = 'chip';
+  chip.innerHTML = '<b>'+a.display+'</b> · '+tier+' · +'+depth;
+  $('qFound').appendChild(chip);
+  inp.value = '';
+  renderHUD(); renderBanner(); renderLadder();
+  if(S.found.length === q.answers.length) finishQuestion(true);
+}
+
+function finishQuestion(all){
+  if(S.locked) return;
+  S.locked = true;
+  clearInterval(S.timer);
+  if(!S.found.length){ S.lives = Math.max(0, S.lives - 1); renderHUD(); }
+  const q = QUESTIONS[S.qi];
+  const inp = $('qInput');
+  inp.disabled = true; $('qSubmit').disabled = true;
+  const missed = q.answers.filter(a=>S.found.indexOf(a.display)===-1);
+  $('qExplain').innerHTML = (all?'<b>Full sweep.</b> ':'<b>Time.</b> ')
+    + (missed.length? 'Left on the board: ' + missed.map(m=>m.display).join(', ') + '. ' : '')
+    + q.reveal;
+  $('qExplain').classList.add('on');
+  $('qNext').classList.add('on');
+}
+function startTimer(){
+  clearInterval(S.timer);
+  const total = S.time;
+  S.timer = setInterval(()=>{
+    if(S.locked){ clearInterval(S.timer); return; }
+    S.time -= 1;
+    const pct = Math.max(0, S.time/total*100);
+    const fill = $('qTimerFill');
+    fill.style.width = pct + '%';
+    if(pct <= 25) fill.classList.add('low');
+    if(S.time <= 0) finishQuestion(false);
+  }, 1000);
+}
+$('qSubmit').onclick = submitAnswer;
+$('qInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); submitAnswer(); }
+});
+/* ---------- comic ---------- */
+function showComic(zi, done){
+  const z = ZONES[zi];
+  if(!z || !z.chapter){ done(); return; }
+  $('cChapter').textContent = z.chapter;
+  $('cZone').textContent = z.t + ' · ' + z.km;
+  $('cTitle').textContent = z.title;
+  $('cBg').style.background = z.glow;
+  $('cBody').innerHTML =
+    (z.caps||[]).map(c=>`<div class="cap">${c}</div>`).join('') +
+    (z.bubble?`<div class="bubble">${z.bubble}</div>`:'') +
+    (z.factBox?`<div class="fact"><div class="fh">${z.factBox.h}</div><p>${z.factBox.p}</p></div>`:'');
+  $('comic').classList.add('on');
+  $('cBtn').onclick = ()=>{ $('comic').classList.remove('on'); done(); };
+}
+
+function advance(rest){
+  if(rest && rest.length){ showComic(rest[0], ()=>advance(rest.slice(1))); return; }
+  if(S.lives<=0 || S.qi >= QUESTIONS.length-1){ endGame(); return; }
+  S.qi++;
+  renderQuestion();
+}
+
+$('qNext').onclick = ()=> advance(S._newly || []);
+
+/* ---------- drawer ---------- */
+function openDrawer(h){
+  $('dBadge').textContent = h.status==='live' ? 'Still returning science' : 'Abandoned';
+  $('dBadge').className = 'badge' + (h.status==='live'?' live':'');
+  $('dTitle').textContent = h.n;
+  $('dWhere').textContent = h.where;
+  $('dFacts').innerHTML = h.f.map(f=>`<div><b>${f[0]}</b><span>${f[1]}</span></div>`).join('');
+  $('dStory').innerHTML = h.s.map(p=>`<p>${p}</p>`).join('');
+  $('dScience').textContent = h.sci;
+  $('dStill').textContent = h.end;
+  $('drawer').classList.add('open');
+  $('scrim').classList.add('on');
+  $('dClose').focus();
+}
+function closeDrawer(){ $('drawer').classList.remove('open'); $('scrim').classList.remove('on'); }
+$('dClose').onclick = closeDrawer;
+$('scrim').onclick = closeDrawer;
+addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeDrawer(); $('comic').classList.remove('on'); } });
+
+/* ---------- flow ---------- */
+function startGame(){
+  newRound();                 /* fresh shuffled prompt order for every dive */
+  Object.assign(S, { zi:0, depth:0, score:0, qi:0, lives:3, seen:new Set([0]), answered:false, over:false, _newly:[], found:[], time:25, locked:false });
+  clearInterval(S.timer);
+  $('startScreen').classList.add('off');
+  $('endScreen').classList.add('off');
+  $('againBtn').textContent = '▼ Dive again';
+  renderLadder(); renderBanner(); renderHUD(); renderAmbient(ZONES[0]); renderQuestion();
+}
+
+function endGame(){
+  S.over = true;
+  const z = ZONES[S.zi];
+  const reached = [...S.seen];
+  const perfect = S.depth >= MAX_DEPTH;
+  $('endKick').textContent = perfect ? 'Descent complete · interstellar' : (S.lives<=0 ? 'Signal lost · lives exhausted' : 'Questions exhausted');
+  $('endTitle').innerHTML = perfect ? 'You reached<span>the edge</span>' : (S.lives<=0 ? 'You stopped<span>short</span>' : 'You went<span>deep</span>');
+  $('endMsg').innerHTML = perfect
+    ? "You crossed every zone from Earth's surface to interstellar space — and every machine you passed is still exactly where it stopped."
+    : `You reached <b>${z.t}</b> at ${fmtKm(S.depth)}. Behind you: ${reached.length} of ${ZONES.length} zones unlocked, each with its own beacon and comic chapter.`;
+  $('endScore').innerHTML = `
+    <div class="sbox gold"><b>${S.score.toLocaleString()}</b><span>Score</span></div>
+    <div class="sbox"><b>${fmtKm(S.depth)}</b><span>Depth reached</span></div>
+    <div class="sbox"><b>${reached.length}/${ZONES.length}</b><span>Zones unlocked</span></div>
+    <div class="sbox"><b>${perfect?'100%':Math.round(S.depth/MAX_DEPTH*100)+'%'}</b><span>Descent</span></div>`;
+  $('endScreen').classList.remove('off');
+}
+
+$('startBtn').onclick = startGame;
+$('againBtn').onclick = startGame;
+
+/* ---------- boot ---------- */
+let booted = false;
+function boot(){
+  if(booted || !QUESTIONS.length) return;
+  booted = true;
+  const b = $('startBtn');
+  b.disabled = false;
+  b.textContent = '▼ Begin descent';
+  $('ruleOne').textContent = `25 seconds per prompt — ${ROUND_SIZE} are drawn at random from the ${QUIZ_POOL.length}-question archive every dive, then shuffled. Type an answer and press Enter; no options shown.`;
+  renderLadder(); renderBanner(); renderHUD(); renderAmbient(ZONES[0]); renderQuestion(true);
+}
+
+/* On http(s) quiz-data.json is authoritative and always fresh. Over file://
+   fetch() is blocked, so the generated shim above is already installed. */
+if(location.protocol !== 'file:' && typeof fetch === 'function'){
+  fetch('quiz-data.json', {cache:'no-store'})
+    .then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d => { installQuiz(d, 'quiz-data.json (live)'); boot(); })
+    .catch(err => { console.warn('[deep-dive] quiz-data.json unavailable, using bundled copy:', err); boot(); });
+} else {
+  boot();
+}
+
+if(!QUESTIONS.length){
+  $('startBtn').textContent = 'Archive unavailable — run sync-quiz.py';
+  $('startBtn').disabled = true;
+}
+
+/* expose for automated testing */
+window.__T = { S, ZONES, QUESTIONS, QUIZ_POOL, RARITY, zoneForDepth, fmtKm,
+               installQuiz, boot, newRound, startGame, norm, findAnswer,
+               setShuffle(v){ SHUFFLE = !!v; return SHUFFLE; },
+               get shuffling(){ return SHUFFLE; },
+               get roundSize(){ return ROUND_SIZE; },
+               get poolSize(){ return QUIZ_POOL.length; },
+               get poolIds(){ return QUIZ_POOL.map(q=>q.id); },
+               get roundIds(){ return QUESTIONS.map(q=>q.id); },
+               get MAX_DEPTH(){ return MAX_DEPTH; },
+               get source(){ return QUIZ_SOURCE; } };
+</script>
+</body>
+</html>

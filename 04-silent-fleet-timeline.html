@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE SILENT FLEET — Interactive 3D Timeline</title>
+<style>
+  :root{
+    --void:#03060f; --grid:rgba(120,170,255,.14);
+    --cyan:#4fe3ff; --gold:#ffd166; --red:#ff6b6b; --green:#5ff7a5;
+    --text:#dbe7ff; --muted:#7c8fb8;
+    --mono:"Consolas","SFMono-Regular",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--void); color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    overflow-x:hidden;
+  }
+  /* starfield */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 22%,#fff,transparent),
+      radial-gradient(1.2px 1.2px at 78% 14%,#cfe4ff,transparent),
+      radial-gradient(1.6px 1.6px at 55% 66%,#fff,transparent),
+      radial-gradient(1.1px 1.1px at 88% 78%,#fff,transparent),
+      radial-gradient(1.3px 1.3px at 32% 84%,#dbe9ff,transparent),
+      radial-gradient(1.1px 1.1px at 65% 36%,#fff,transparent);
+    animation:twinkle 12s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle{to{opacity:.45}}
+
+  /* perspective floor grid */
+  .floor{
+    position:fixed; left:-30%; right:-30%; bottom:-6vh; height:46vh; z-index:0;
+    background:
+      linear-gradient(transparent 0%, rgba(3,6,15,.9) 92%),
+      repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 78px),
+      repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 54px);
+    transform:perspective(420px) rotateX(63deg);
+    transform-origin:bottom center; pointer-events:none;
+    mask-image:linear-gradient(transparent,#000 40%);
+  }
+
+  .layer{position:relative; z-index:2}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:96px 26px 40px; text-align:center; max-width:1000px; margin:0 auto}
+  .tagline{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.42em;
+    text-transform:uppercase; color:var(--cyan); margin-bottom:22px;
+  }
+  h1{
+    font-size:clamp(44px,10vw,124px); font-weight:900; line-height:.85;
+    letter-spacing:-4px; text-transform:uppercase;
+  }
+  h1 .outline{color:transparent; -webkit-text-stroke:2.5px var(--cyan); display:block}
+  .intro{
+    margin:30px auto 0; max-width:70ch; font-size:17px;
+    line-height:1.7; color:var(--muted);
+  }
+  .intro b{color:var(--text); font-weight:600}
+
+  .controls{
+    display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+    margin-top:34px;
+  }
+  .controls button{
+    font:inherit; font-size:12.5px; font-weight:600; font-family:var(--mono);
+    letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted); background:rgba(79,227,255,.05);
+    border:1px solid rgba(120,170,255,.28); border-radius:999px;
+    padding:10px 20px; cursor:pointer; transition:.2s;
+  }
+  .controls button:hover{color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 20px rgba(79,227,255,.25)}
+  .controls button.on{background:var(--cyan); color:#03121a; border-color:var(--cyan)}
+
+  /* ---------- TIMELINE ---------- */
+  .rail-wrap{position:relative; margin-top:44px; padding-bottom:40px}
+  .rail{
+    position:relative; display:flex; gap:44px;
+    overflow-x:auto; overflow-y:hidden;
+    padding:70px 8vw 90px; scroll-snap-type:x mandatory;
+    scrollbar-width:thin; scrollbar-color:#24406a transparent;
+  }
+  .rail::-webkit-scrollbar{height:9px}
+  .rail::-webkit-scrollbar-thumb{background:#24406a; border-radius:9px}
+  .rail::-webkit-scrollbar-track{background:rgba(255,255,255,.04)}
+
+  /* the line */
+  .rail::before{
+    content:""; position:absolute; left:8vw; right:8vw; top:50%;
+    height:2px; background:linear-gradient(90deg,transparent,var(--cyan) 6%,var(--cyan) 94%,transparent);
+    box-shadow:0 0 18px var(--cyan);
+  }
+  .era{
+    position:absolute; top:50%; transform:translateY(-50%);
+    font-family:var(--mono); font-size:11px; letter-spacing:.24em;
+    color:var(--cyan); background:var(--void); padding:0 14px;
+    text-transform:uppercase; z-index:3; white-space:nowrap;
+  }
+
+  .node{
+    position:relative; flex:0 0 300px; scroll-snap-align:center;
+    display:flex; flex-direction:column; justify-content:space-between;
+    min-height:430px; cursor:pointer;
+    perspective:900px;
+  }
+  .node .yr{
+    text-align:center; font-family:var(--mono); font-size:15px;
+    font-weight:700; letter-spacing:.2em; color:var(--gold);
+    text-shadow:0 0 16px rgba(255,209,102,.55);
+  }
+  .card{
+    position:relative; background:linear-gradient(165deg,rgba(15,24,46,.96),rgba(7,12,26,.96));
+    border:1px solid rgba(120,170,255,.3); border-radius:14px;
+    padding:22px 20px 20px; margin:18px 0;
+    transform-style:preserve-3d;
+    transition:transform .35s cubic-bezier(.2,.8,.3,1), border-color .3s, box-shadow .3s;
+    box-shadow:0 24px 50px rgba(0,0,0,.6);
+    backdrop-filter:blur(6px);
+  }
+  .node:hover .card,.node:focus-visible .card{
+    transform:rotateY(-7deg) rotateX(4deg) translateY(-6px);
+    border-color:var(--cyan);
+    box-shadow:-16px 30px 60px rgba(0,0,0,.7), 0 0 34px rgba(79,227,255,.3);
+  }
+  .node:focus-visible{outline:none}
+  .node .status{
+    position:absolute; top:-11px; left:18px;
+    font-family:var(--mono); font-size:9.5px; font-weight:700;
+    letter-spacing:.16em; text-transform:uppercase; padding:4px 10px;
+    border-radius:4px; background:var(--red); color:#2a0505;
+  }
+  .node .status.live{background:var(--green); color:#00331b}
+  .node .icon{
+    width:58px; height:58px; margin-bottom:14px; border-radius:12px;
+    display:grid; place-items:center; font-size:27px;
+    background:radial-gradient(circle at 30% 25%,rgba(79,227,255,.28),rgba(79,227,255,.06));
+    border:1px solid rgba(79,227,255,.35);
+    filter:drop-shadow(0 0 12px rgba(79,227,255,.4));
+  }
+  .node h3{font-size:19px; font-weight:800; line-height:1.2; letter-spacing:-.3px}
+  .node .where{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--cyan); margin:7px 0 12px;
+  }
+  .node .blurb{font-size:13.5px; line-height:1.6; color:#a8bbdd}
+  .node .blurb b{color:var(--text)}
+  .node .stats{
+    display:flex; gap:14px; margin-top:16px; padding-top:14px;
+    border-top:1px dashed rgba(120,170,255,.25);
+    font-family:var(--mono); font-size:11px;
+  }
+  .node .stats div b{display:block; color:var(--gold); font-size:14px}
+  .node .stats div span{color:var(--muted); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase}
+  .node .more{
+    margin-top:14px; font-family:var(--mono); font-size:10.5px;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--cyan);
+  }
+
+  /* dot on the line */
+  .node::after{
+    content:""; position:absolute; left:50%; bottom:-31px;
+    width:15px; height:15px; border-radius:50%; transform:translateX(-50%);
+    background:var(--cyan); box-shadow:0 0 0 4px rgba(79,227,255,.2),0 0 22px var(--cyan);
+  }
+  .node.live::after{background:var(--green); box-shadow:0 0 0 4px rgba(95,247,165,.2),0 0 22px var(--green)}
+
+  .rail-hint{
+    text-align:center; font-family:var(--mono); font-size:11.5px;
+    letter-spacing:.24em; text-transform:uppercase; color:var(--muted);
+    padding-bottom:8px;
+  }
+  .rail-hint span{color:var(--cyan)}
+
+  /* ---------- DETAIL MODAL ---------- */
+  .modal{
+    position:fixed; inset:0; z-index:90; display:grid; place-items:center;
+    background:rgba(2,4,10,.86); backdrop-filter:blur(9px);
+    opacity:0; pointer-events:none; transition:.3s; padding:24px;
+  }
+  .modal.on{opacity:1; pointer-events:auto}
+  .sheet{
+    width:min(760px,100%); max-height:88vh; overflow-y:auto;
+    background:linear-gradient(160deg,#0d1730,#060b1a);
+    border:1px solid var(--cyan); border-radius:18px; padding:34px;
+    box-shadow:0 40px 90px rgba(0,0,0,.8),0 0 60px rgba(79,227,255,.22);
+    transform:translateY(24px) scale(.97); transition:.32s;
+  }
+  .modal.on .sheet{transform:none}
+  .sheet .top{display:flex; justify-content:space-between; gap:18px; align-items:flex-start}
+  .sheet .st{
+    font-family:var(--mono); font-size:10px; letter-spacing:.2em;
+    text-transform:uppercase; padding:5px 11px; border-radius:4px;
+    background:var(--red); color:#2a0505; font-weight:700;
+  }
+  .sheet .st.live{background:var(--green); color:#00331b}
+  .sheet h2{font-size:30px; font-weight:900; letter-spacing:-.8px; line-height:1.1; margin-top:12px}
+  .sheet .loc{font-family:var(--mono); font-size:12px; color:var(--cyan); letter-spacing:.14em; text-transform:uppercase; margin-top:9px}
+  .close{
+    background:none; border:1px solid rgba(120,170,255,.4); color:var(--muted);
+    width:40px; height:40px; border-radius:10px; cursor:pointer; font-size:18px; flex:none;
+  }
+  .close:hover{color:var(--cyan); border-color:var(--cyan)}
+  .kpis{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+    gap:12px; margin:26px 0;
+  }
+  .kpi{background:rgba(79,227,255,.07); border:1px solid rgba(79,227,255,.25); border-radius:11px; padding:15px; text-align:center}
+  .kpi b{display:block; font-family:var(--mono); font-size:23px; color:var(--cyan); font-weight:700}
+  .kpi span{font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em}
+  .sheet h4{
+    font-family:var(--mono); font-size:11px; letter-spacing:.24em;
+    text-transform:uppercase; color:var(--gold); margin:24px 0 10px;
+  }
+  .sheet p{color:#bcccec; font-size:15px; line-height:1.72; margin-bottom:12px}
+  .callout{
+    background:rgba(255,209,102,.09); border-left:3px solid var(--gold);
+    padding:15px 18px; border-radius:0 10px 10px 0; font-size:14.5px;
+    color:#ffe9bc; line-height:1.65;
+  }
+  .callout b{color:var(--gold)}
+  .cta{
+    display:inline-block; margin-top:24px; font-family:var(--mono);
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    background:var(--cyan); color:#03121a; text-decoration:none;
+    padding:13px 24px; border-radius:8px; font-weight:700;
+    box-shadow:0 0 26px rgba(79,227,255,.4);
+  }
+  .cta:hover{transform:translateY(-2px)}
+
+  /* ---------- SUMMARY ---------- */
+  .summary{max-width:1000px; margin:0 auto; padding:20px 26px 80px}
+  .summary h2{
+    font-size:clamp(26px,4vw,42px); font-weight:900; letter-spacing:-1px;
+    text-transform:uppercase; margin-bottom:8px;
+  }
+  .summary h2 span{color:transparent; -webkit-text-stroke:1.5px var(--cyan)}
+  .summary .lede{color:var(--muted); font-size:16px; line-height:1.7; max-width:74ch; margin-bottom:28px}
+  table{
+    width:100%; border-collapse:collapse; font-size:14px;
+    background:rgba(10,18,38,.7); border:1px solid rgba(120,170,255,.28);
+    border-radius:12px; overflow:hidden;
+  }
+  th,td{padding:14px 16px; text-align:left; border-bottom:1px solid rgba(120,170,255,.16)}
+  th{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--cyan); background:rgba(79,227,255,.08);
+  }
+  td{color:#b7c8e8}
+  tr:last-child td{border-bottom:0}
+  tbody tr:hover td{background:rgba(79,227,255,.05)}
+  td b{color:var(--text)}
+  .dotg{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--green); margin-right:8px}
+  .dotr{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--red); margin-right:8px}
+  .foot{
+    text-align:center; padding:30px 26px 50px; font-family:var(--mono);
+    font-size:11.5px; color:#54648c; line-height:1.9; border-top:1px solid rgba(120,170,255,.18);
+  }
+  .foot a{color:var(--cyan); text-decoration:none}
+
+  @media(max-width:640px){
+    .node{flex:0 0 84vw; min-height:auto}
+    .rail::before{left:6vw; right:6vw}
+    .sheet{padding:24px 20px}
+  }
+</style>
+<link rel="stylesheet" href="kid-mode.css">
+<script src="kid-mode.js"></script>
+</head>
+<body>
+<div class="floor"></div>
+
+<div class="layer">
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="tagline">2026 NASA Space Apps · Interactive 3D Timeline</div>
+    <h1>THE<span class="outline">SILENT FLEET</span></h1>
+    <p class="intro">Every machine humans have abandoned beyond Earth, arranged by the moment each one went quiet. <b>Spin a card, open a node, follow the line</b> — from the first surveyor that proved the Moon could hold a lander, to two Voyagers still whispering from interstellar space.</p>
+    <div class="controls" id="controls">
+      <button data-f="all" class="on">All hardware</button>
+      <button data-f="moon">🌙 Moon</button>
+      <button data-f="mars">🔴 Mars</button>
+      <button data-f="deep">🪐 Deep space</button>
+      <button data-f="live">🟢 Still active</button>
+    </div>
+  </section>
+
+  <!-- ============ TIMELINE ============ -->
+  <section class="rail-wrap">
+    <div class="rail" id="rail"></div>
+    <div class="rail-hint">◀ Drag / scroll the timeline · <span>Click any node for the full story</span> ▶</div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="summary">
+    <h2>Every node, <span>at a glance</span></h2>
+    <p class="lede">A comparison table for the whole class. Status, location, what it found, and whether it is still doing science — all on one screen.</p>
+    <table>
+      <thead>
+        <tr><th>Hardware</th><th>Went quiet</th><th>Where it sits</th><th>Key discovery</th><th>Status</th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </section>
+
+  <footer class="foot">
+    Educational prototype · 2026 NASA Space Apps Challenge<br>
+    Dates and figures compiled from published NASA/JPL mission records — verify against the official Resources tab before submission.<br>
+    Other formats: <a href="01-ghost-rover-map.html">Ghost Map</a> · <a href="02-graphic-novel.html">Graphic Novel</a> · <a href="03-signal-lost-podcast.html">Signal Lost Podcast</a>
+  </footer>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal" id="modal">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+const NODES=[
+  {id:1, y:"1966", icon:"🛰️", body:"moon", live:false, tag:"Surveyor 1",
+   where:"Oceanus Procellarum · Moon", short:"First US soft landing on another world — proved the lunar soil could hold a lander.",
+   kpis:[["Jul 1966","Landed"],["11,000+","Images"],["7 craft","Series"]],
+   story:[
+     "Surveyor 1 touched down gently in Oceanus Procellarum on 2 June 1966, becoming the first American spacecraft to land softly on the Moon. It arrived six weeks before the Soviet Luna 9.",
+     "Its job was unglamorous and essential: photograph the surface, test how much weight the soil would take, and show NASA whether Apollo would sink."
+   ],
+   science:"Without Surveyor's soil-bearing measurements, Apollo 11 would have been a blind gamble. The series returned more than 100,000 images in total.",
+   end:"Silent since 1966. Still standing where it landed."},
+
+  {id:2, y:"1969", icon:"🌕", body:"moon", live:false, tag:"Apollo 11 Descent Stage",
+   where:"Sea of Tranquility · Moon", short:"The bottom half of the Eagle — engine, tanks and legs — left behind when the crew lifted off.",
+   kpis:[["Jul 1969","Landed"],["2 people","Carried"],["Still there","Status"]],
+   story:[
+     "When Armstrong and Aldrin climbed back into the ascent stage and fired the engine, everything they did not need stayed behind — the descent stage became the first human-made object deliberately abandoned on another world.",
+     "It sits at Tranquility Base undisturbed, because the Moon has no wind, no rain and no weather to erode it."
+   ],
+   science:"Its laser retroreflector still bounces beams from Earth, letting astronomers measure the Earth–Moon distance to within a few millimetres and test general relativity.",
+   end:"Still working: the retroreflector is used in ranging experiments today."},
+
+  {id:3, y:"1971", icon:"🛻", body:"moon", live:false, tag:"Apollo 15 Rover",
+   where:"Hadley–Apennine · Moon", short:"First lunar buggy. Three of them are parked on the Moon where their crews finished with them.",
+   kpis:[["1971","Deployed"],["27.9 km","Driven"],["3","Left on Moon"]],
+   story:[
+     "The Lunar Roving Vehicle let astronauts explore kilometres away from the lander instead of metres. Apollo 15's crew drove 27.9 km and hauled 77 kg of samples back to Earth.",
+     "Each rover was left behind deliberately — there was no way to bring it home and no reason to."
+   ],
+   science:"Apollo 15 discovered the “Genesis Rock,” an ancient fragment of the Moon's original crust, found only because the rover carried them to the right geological boundary.",
+   end:"Tyre tracks, footprints and rover tracks remain preserved for millions of years."},
+
+  {id:4, y:"1976", icon:"🔴", body:"mars", live:false, tag:"Viking 1",
+   where:"Chryse Planitia · Mars", short:"First successful US landing on Mars. Worked six years, longer than anyone expected.",
+   kpis:[["1976","Landed"],["6 yrs","Operated"],["1st","US Mars landing"]],
+   story:[
+     "Viking 1 landed on 20 July 1976 — seven years to the day after Apollo 11 touched the Moon — and sent back the first colour panorama of the Martian surface.",
+     "It ran for six years, far beyond its design life, and returned soil data that scientists still argue about."
+   ],
+   science:"Its biology experiments produced ambiguous signals that launched decades of debate about life on Mars, and its soil chemistry revealed perchlorates that later missions confirmed.",
+   end:"Standing on Chryse Planitia since 1976."},
+
+  {id:5, y:"1997", icon:"🤖", body:"mars", live:false, tag:"Sojourner",
+   where:"Ares Vallis · Mars", short:"650 grams. The first wheeled vehicle ever to drive on another planet.",
+   kpis:[["650 g","Weight"],["65 cm","Length"],["1997","Died"]],
+   story:[
+     "Sojourner was the size of a microwave oven and rolled off its lander in July 1997 to become the first rover on Mars. It spent its entire life within a few metres of Pathfinder.",
+     "It survived three times longer than planned, then went silent when its battery could no longer survive the cold."
+   ],
+   science:"Its spectrometer analysed flood-plain rocks at Ares Vallis and confirmed they had been shaped and transported by water.",
+   end:"It sits where it stopped, wheels on the ground."},
+
+  {id:6, y:"2003", icon:"🪐", body:"deep", live:false, tag:"Galileo",
+   where:"Jupiter · Deep space", short:"Crashed into Jupiter on purpose to protect Europa from contamination.",
+   kpis:[["14 yrs","Mission"],["2003","Destroyed"],["Europa","Ocean found"]],
+   story:[
+     "Galileo was the first spacecraft to orbit Jupiter. When its fuel ran out in 2003, NASA chose to fly it into Jupiter's atmosphere rather than let it drift toward Europa — a moon that might harbour life.",
+     "It burned up on 21 September 2003 at enormous speed. The destruction was the mission plan."
+   ],
+   science:"Galileo produced the first strong evidence for a salty liquid ocean beneath Europa's ice — the discovery that directly drives today's Europa Clipper mission.",
+   end:"Gone by design, to protect a world we have not even landed on yet."},
+
+  {id:7, y:"2004", icon:"🚙", body:"mars", live:false, tag:"Spirit",
+   where:"Gusev Crater · Mars", short:"Six years of driving. Found hot-spring silica — then its wheel seized and it kept going backwards.",
+   kpis:[["6 yrs","Operated"],["22 km","Distance"],["2011","Declared dead"]],
+   story:[
+     "Spirit landed in January 2004 for a 90-day mission and worked until 2010. When a wheel jammed, engineers dragged it backwards, using the dead wheel as a plough.",
+     "That improvised plough uncovered bright silica deposits — and drove the rover's most important discovery."
+   ],
+   science:"Pure silica like that forms in hot springs or steam vents: warm, wet, chemically active ground. Gusev Crater once hosted exactly that.",
+   end:"Stuck in soft soil where it went silent in March 2010."},
+
+  {id:8, y:"2004", icon:"🛻", body:"mars", live:false, tag:"Opportunity",
+   where:"Meridiani Planum · Mars", short:"Built for 90 days, lasted 15 years, drove 45 km, and found proof of an ancient sea.",
+   kpis:[["45 km","Distance"],["15 yrs","Ran"],["Jun 2018","Final signal"]],
+   story:[
+     "Opportunity is the most famous abandoned rover. It found grey hematite “blueberries” — spheres that only form in liquid water — and drove into Endurance Crater to read rock layers 100 million years older than the surface.",
+     "A planet-engulfing dust storm in June 2018 blocked the Sun and drained the battery. NASA tried more than a thousand times to call it back."
+   ],
+   science:"Opportunity proved Meridiani Planatum was once covered by liquid water, using hematite, sulfate minerals and sedimentary layering — one of the strongest cases for habitable ancient Mars.",
+   end:"Silent since June 2018. Mission declared over in February 2019."},
+
+  {id:9, y:"2008", icon:"🧊", body:"mars", live:false, tag:"Phoenix",
+   where:"Vastitas Borealis · Mars", short:"Dug at the north pole and found water ice just centimetres under the soil.",
+   kpis:[["May 2008","Landed"],["Ice","Confirmed"],["Nov 2008","Died"]],
+   story:[
+     "Phoenix was built to survive a single Martian winter at the north pole. It scraped away the topsoil with a robotic arm and found white ice directly beneath.",
+     "When polar darkness arrived in November 2008, the solar panels could not recharge the battery. It fell silent exactly as predicted."
+   ],
+   science:"Phoenix confirmed water ice at high latitude and detected perchlorates in the soil — chemistry that shapes both Mars science and the safety of future human crews.",
+   end:"Probably still there under a coating of frost and dust."},
+
+  {id:10, y:"2009", icon:"☄️", body:"moon", live:false, tag:"LCROSS Impactor",
+   where:"Cabeus crater · Moon", short:"Deliberately slammed a rocket stage into a shadowed crater to hunt for water ice.",
+   kpis:[["Oct 2009","Impacted"],["9,000 km/h","Speed"],["Water","Confirmed"]],
+   story:[
+     "LCROSS was an intentional crash. It fired its rocket stage into a permanently shadowed crater at the Moon's south pole, then flew through the rising plume to analyse the debris.",
+     "The observing spacecraft followed behind, gathering spectra before looping away."
+   ],
+   science:"The impact confirmed water ice in permanently shadowed lunar craters — a resource future astronauts could turn into drinking water and rocket propellant. It changed where NASA plans to land.",
+   end:"The impactor's debris is now spread across the floor of Cabeus crater."},
+
+  {id:11, y:"2018", icon:"📡", body:"mars", live:false, tag:"InSight",
+   where:"Elysium Planitia · Mars", short:"Never moved a metre. Planted a seismometer and heard 1,300+ marsquakes.",
+   kpis:[["1,300+","Marsquakes"],["4 yrs","Ran"],["Dec 2022","Died"]],
+   story:[
+     "InSight was a stationary lander. It placed a seismometer under a shield on Elysium Planitia, folded its arm away and never travelled again.",
+     "Dust slowly coated its solar panels. In December 2022 NASA sent a final command and listened one last time — nothing came back."
+   ],
+   science:"InSight mapped the size of Mars's core and the thickness of its crust, and proved the planet is still geologically alive. We learned what is inside Mars.",
+   end:"The seismometer remains — the first geophysical station on another planet."},
+
+  {id:12, y:"2018", icon:"🔭", body:"deep", live:false, tag:"Kepler",
+   where:"Earth-trailing orbit · Deep space", short:"Stared at 150,000 stars and proved planets are everywhere.",
+   kpis:[["2,600+","Exoplanets"],["9 yrs","Ran"],["2018","Retired"]],
+   story:[
+     "Kepler watched one patch of sky for years, waiting for the tiny dip in brightness when a planet crosses its star. When reaction wheels failed in 2013 it was reborn as K2, using sunlight as a stabiliser.",
+     "It was retired in 2018 and left in an orbit that trails Earth around the Sun."
+   ],
+   science:"Kepler found more than 2,600 confirmed exoplanets and showed that most stars in the galaxy have planets — a statistic humanity simply did not have before it launched.",
+   end:"Silent since 2018, drifting behind Earth."},
+
+  {id:13, y:"2017", icon:"🪐", body:"deep", live:false, tag:"Cassini",
+   where:"Saturn · Deep space", short:"Flew itself into Saturn's atmosphere to avoid contaminating Enceladus. “Grand Finale.”",
+   kpis:[["22 yrs","Mission"],["144","Final orbits"],["Sep 2017","End"]],
+   story:[
+     "Cassini spent 20 years at Saturn. With fuel running out, engineers flew it 22 times through the gap between the planet and its rings, then deliberately destroyed it in Saturn's atmosphere on 15 September 2017.",
+     "The reason was protection: Enceladus has an ocean, and Cassini must never be allowed to crash into it."
+   ],
+   science:"Cassini found a global liquid ocean beneath Enceladus's ice and a methane sea on Titan — two of the most promising places to look for life beyond Earth.",
+   end:"Destroyed by design. Its data is still being re-analysed today."},
+
+  {id:14, y:"2024", icon:"🌙", body:"moon", live:false, tag:"Odysseus IM-1",
+   where:"Malapert A · Moon", short:"First US Moon landing since 1972 — then it tipped onto its side.",
+   kpis:[["Feb 2024","Landed"],["Tipped over","Landed"],["6 of 7","Instruments"]],
+   story:[
+     "Odysseus was the first American spacecraft to soft-land on the Moon since 1972 and the first commercial lander in NASA's CLPS programme. It came down hard and tipped over.",
+     "Even on its side it kept working long enough to return data from six of its seven instruments."
+   ],
+   science:"It returned measurements of the surface and the plasma environment near the lunar south pole — the region targeted by Artemis crewed landings.",
+   end:"Silent now, but it opened the door for commercial lunar delivery."},
+
+  {id:15, y:"1977–", icon:"🛰️", body:"deep", live:true, tag:"Voyager 1 & 2",
+   where:"Interstellar space", short:"The exception. Both are still transmitting from beyond the Sun's influence.",
+   kpis:[["1977","Launched"],["~22 hrs","Signal delay"],["2","Still talking"]],
+   story:[
+     "Launched in 1977, both Voyagers are still communicating from interstellar space — the most distant human-made objects in existence. They are not abandoned; they are simply very far away.",
+     "Each carries the Golden Record: sounds and images of Earth, in case anything ever finds them."
+   ],
+   science:"Voyagers confirmed ocean worlds at Jupiter and Saturn, discovered active volcanoes on Io, and are now measuring the boundary where the Sun's wind meets interstellar space.",
+   end:"STILL TALKING. When they fall silent, they will keep travelling — the longest-lasting objects humanity has made."}
+];
+
+const rail=document.getElementById('rail');
+const modal=document.getElementById('modal');
+const sheet=document.getElementById('sheet');
+
+function render(filter){
+  const list=NODES.filter(n=>{
+    if(filter==='all') return true;
+    if(filter==='live') return n.live;
+    return n.body===filter;
+  }).sort((a,b)=>a.y.localeCompare(b.y));
+
+  rail.innerHTML='';
+  list.forEach(n=>{
+    const el=document.createElement('article');
+    el.className='node'+(n.live?' live':'');
+    el.tabIndex=0; el.setAttribute('role','button');
+    el.innerHTML=`
+      <div class="yr">${n.y}</div>
+      <div class="card">
+        <span class="status ${n.live?'live':''}">${n.live?'Still active':'Signal lost'}</span>
+        <div class="icon">${n.icon}</div>
+        <h3>${n.tag}</h3>
+        <div class="where">${n.where}</div>
+        <div class="blurb">${n.short}</div>
+        <div class="stats">
+          ${n.kpis.map(k=>`<div><b>${k[0]}</b><span>${k[1]}</span></div>`).join('')}
+        </div>
+        <div class="more">▸ Open full story</div>
+      </div>`;
+    el.onclick=()=>open(n);
+    el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(n)}};
+    rail.appendChild(el);
+  });
+}
+
+function open(n){
+  sheet.innerHTML=`
+    <div class="top">
+      <div>
+        <span class="st ${n.live?'live':''}">${n.live?'Still transmitting':'Signal lost · ${n.y}'}</span>
+        <h2>${n.tag}</h2>
+        <div class="loc">${n.where}</div>
+      </div>
+      <button class="close" aria-label="Close">✕</button>
+    </div>
+    <div class="kpis">${n.kpis.map(k=>`<div class="kpi"><b>${k[0]}</b><span>${k[1]}</span></div>`).join('')}</div>
+    <h4>The story</h4>
+    ${n.story.map(p=>`<p>${p}</p>`).join('')}
+    <h4>The science it made possible</h4>
+    <div class="callout"><b>Key finding:</b> ${n.science}</div>
+    <p style="margin-top:18px; color:#8fa6cc; font-family:Consolas,monospace; font-size:13px">${n.end}</p>
+    <a class="cta" href="#" onclick="event.preventDefault();document.getElementById('modal').classList.remove('on')">◂ Back to timeline</a>`;
+  sheet.querySelector('.close').onclick=close;
+  modal.classList.add('on');
+}
+function close(){modal.classList.remove('on')}
+modal.onclick=e=>{if(e.target===modal)close()};
+addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+document.getElementById('controls').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#controls button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  render(b.dataset.f);
+  rail.scrollTo({left:0,behavior:'smooth'});
+});
+
+// summary table
+document.getElementById('tbody').innerHTML=
+  [...NODES].sort((a,b)=>a.y.localeCompare(b.y)).map(n=>`
+    <tr>
+      <td><b>${n.icon} ${n.tag}</b></td>
+      <td>${n.y}</td>
+      <td>${n.where}</td>
+      <td>${n.science.slice(0,96)}…</td>
+      <td><span class="${n.live?'dotg':'dotr'}"></span>${n.live?'Active':'Silent'}</td>
+    </tr>`).join('');
+
+render('all');
+</script>
+</body>
+</html>

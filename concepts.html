@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept archive — Space Apps 2026</title>
+<style>
+  :root{
+    --bg:#0b0d14; --card:#141826; --line:#252c44;
+    --text:#e7ebf7; --muted:#8e99bb;
+    --c1:#5be7ff; --c2:#ff6b6b; --c3:#f5a623; --c4:#a78bfa; --c5:#5ff7a5; --c6:#ffd166;
+    --good:#5ff7a5; --warn:#ffd166;
+    --mono:Consolas,"SFMono-Regular",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    line-height:1.6;
+    background-image:radial-gradient(900px 500px at 12% -8%, rgba(91,231,255,.11), transparent),
+                     radial-gradient(800px 480px at 95% 4%, rgba(167,139,250,.11), transparent);
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px}
+
+  header{padding:74px 0 40px; border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono); font-size:11.5px; letter-spacing:.34em; text-transform:uppercase; color:var(--c1); margin-bottom:18px}
+  h1{font-size:clamp(34px,6vw,64px); font-weight:900; line-height:1.02; letter-spacing:-2px; max-width:20ch}
+  h1 em{font-style:normal; color:var(--c4)}
+  .sub{margin-top:20px; color:var(--muted); font-size:17px; max-width:74ch}
+  .brief{
+    margin-top:28px; padding:18px 22px; border-left:3px solid var(--c3);
+    background:rgba(245,166,35,.07); border-radius:0 10px 10px 0;
+    font-size:14.5px; color:#e6d5b4; max-width:80ch;
+  }
+  .brief b{color:var(--c3)}
+
+  /* ---------- CARDS ---------- */
+  .grid{display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(268px,1fr)); margin:44px 0}
+  .idea{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:26px 22px; display:flex; flex-direction:column;
+    position:relative; overflow:hidden; transition:.25s;
+  }
+  .idea::before{content:""; position:absolute; top:0; left:0; right:0; height:4px; background:var(--ac)}
+  .idea:hover{transform:translateY(-6px); border-color:var(--ac); box-shadow:0 20px 50px rgba(0,0,0,.5)}
+  .num{font-family:var(--mono); font-size:11.5px; letter-spacing:.24em; color:var(--ac); text-transform:uppercase}
+  .idea h2{font-size:22px; margin:12px 0 4px; letter-spacing:-.5px; line-height:1.2}
+  .idea .fmt{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.14em; margin-bottom:14px}
+  .idea p{font-size:14px; color:#b3bcdb; line-height:1.65; flex:1}
+  .tagrow{display:flex; flex-wrap:wrap; gap:7px; margin-top:18px}
+  .tagrow span{
+    font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    padding:4px 9px; border-radius:5px; background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--muted);
+  }
+  .scores{display:grid; grid-template-columns:1fr 1fr; gap:9px 16px; margin-top:20px; padding-top:16px; border-top:1px dashed var(--line)}
+  .score{font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; justify-content:space-between}
+  .score b{color:var(--good)}
+  .score b.mid{color:var(--warn)}
+  .open{
+    margin-top:20px; display:block; text-align:center; text-decoration:none;
+    font-family:var(--mono); font-size:12.5px; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; padding:13px; border-radius:9px;
+    background:var(--ac); color:#080a11; transition:.2s;
+  }
+  .open:hover{filter:brightness(1.15); transform:translateY(-2px)}
+
+  /* ---------- MATRIX ---------- */
+  section{margin:56px 0}
+  .sec-head{margin-bottom:22px}
+  .sec-head h2{font-size:clamp(24px,3.6vw,38px); font-weight:900; letter-spacing:-1.2px}
+  .sec-head p{color:var(--muted); margin-top:8px; max-width:76ch; font-size:15.5px}
+
+  .tablebox{overflow-x:auto; border:1px solid var(--line); border-radius:14px; background:var(--card)}
+  table{width:100%; border-collapse:collapse; min-width:760px; font-size:14px}
+  th,td{padding:15px 18px; text-align:left; border-bottom:1px solid var(--line)}
+  th{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--muted); background:rgba(255,255,255,.03);
+    position:sticky; top:0;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover td{background:rgba(255,255,255,.03)}
+  td:first-child{font-weight:700; color:var(--text)}
+  td{color:#aab4d4; vertical-align:top}
+  .col1{color:var(--c1)} .col2{color:var(--c2)} .col3{color:var(--c3)} .col4{color:var(--c4)}
+  .th1{color:var(--c1)!important} .th2{color:var(--c2)!important} .th3{color:var(--c3)!important} .th4{color:var(--c4)!important} .th5{color:var(--c5)!important}
+
+  .stars{font-family:var(--mono); letter-spacing:.1em; color:var(--warn)}
+  .stars .off{color:#333b58}
+
+  /* ---------- RECOMMENDATION ---------- */
+  .rec{
+    display:grid; gap:22px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  }
+  .recbox{
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:26px 24px;
+  }
+  .recbox.win{border-color:var(--good); box-shadow:0 0 44px rgba(95,247,165,.14)}
+  .recbox h3{font-size:19px; margin-bottom:6px; letter-spacing:-.4px}
+  .recbox .badge{
+    display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:.18em;
+    text-transform:uppercase; padding:5px 11px; border-radius:5px; margin-bottom:14px;
+    background:rgba(255,255,255,.06); color:var(--muted);
+  }
+  .recbox.win .badge{background:rgba(95,247,165,.16); color:var(--good)}
+  .recbox p{font-size:14.5px; color:#b3bcdb}
+  .recbox ul{margin-top:14px; padding-left:20px; font-size:14px; color:#b3bcdb}
+  .recbox li{margin-bottom:7px}
+  .recbox li b{color:var(--text)}
+
+  /* ---------- NEXT STEPS ---------- */
+  ol.steps{counter-reset:s; display:grid; gap:14px; list-style:none}
+  ol.steps li{
+    counter-increment:s; background:var(--card); border:1px solid var(--line);
+    border-radius:13px; padding:20px 22px 20px 74px; position:relative; font-size:15px; color:#b3bcdb;
+  }
+  ol.steps li::before{
+    content:counter(s,decimal-leading-zero); position:absolute; left:22px; top:50%;
+    transform:translateY(-50%); font-family:var(--mono); font-size:24px;
+    font-weight:700; color:var(--c4);
+  }
+  ol.steps li b{color:var(--text); display:block; margin-bottom:3px; font-size:16px}
+
+  footer{
+    margin-top:64px; border-top:1px solid var(--line); padding:28px 0 60px;
+    font-family:var(--mono); font-size:11.5px; color:#5d6787; line-height:1.9; text-align:center;
+  }
+</style>
+<link rel="stylesheet" href="kid-mode.css">
+<script src="kid-mode.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">2026 NASA Space Apps · Challenge: Abandoned but not Forgotten</div>
+    <h1>Concept archive. <em>Six prototypes, one main experience, one story.</em></h1>
+    <p class="sub">The fused Ghost Atlas is now the live main page. This archive preserves the original five concept pages and their comparison notes.</p>
+    <div style="margin-top:18px"><a href="patchwork.html" style="display:inline-block;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;padding:12px 18px;border-radius:9px;background:var(--c5);color:#080a11;margin:0 10px 10px 0">▶ Chapter Zero: PATCHWORK · the comic</a><a href="index.html" style="display:inline-block;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;padding:12px 18px;border-radius:9px;background:var(--c6);color:#080a11">◀ Back to THE GHOST ATLAS · main page</a></div>
+    <div class="brief">
+      <b>The brief in one line:</b> create an engaging, story-driven educational tool that teaches school-age and casual space enthusiasts about the hardware NASA left on the Moon, Mars and elsewhere — showing <b>how the missions operated</b>, not just listing facts, and drawing a clear line between the engineering and the science it produced. Accuracy is graded.
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ THE FIVE ============ -->
+  <div class="grid">
+    <article class="idea" style="--ac:var(--c1)">
+      <div class="num">Concept 01</div>
+      <h2>Ghost Map</h2>
+      <div class="fmt">Interactive web experience</div>
+      <p>An explorable map of the Moon, Mars and deep space. Click glowing beacons to open a story drawer for each abandoned machine — what it was sent to do, what it found, and whether it is still working. Three switchable worlds, live-vs-silent legend, and a card grid below.</p>
+      <div class="tagrow"><span>HTML/CSS/JS only</span><span>Clickable map</span><span>No dependencies</span></div>
+      <div class="scores">
+        <div class="score">Engagement <b>★★★★☆</b></div>
+        <div class="score">Simplicity <b>★★★★★</b></div>
+        <div class="score">Story depth <b class="mid">★★★☆☆</b></div>
+        <div class="score">Build time <b>1–2 days</b></div>
+      </div>
+      <a class="open" href="01-ghost-rover-map.html">▸ Open concept 01</a>
+    </article>
+
+    <article class="idea" style="--ac:var(--c2)">
+      <div class="num">Concept 02</div>
+      <h2>“My Battery Is Low”</h2>
+      <div class="fmt">Digital graphic novel</div>
+      <p>A scroll-driven comic book telling Opportunity's 15-year story in three chapters — panels, speech bubbles, sound effects and halftone texture — with dark “Fact File” boxes dropping the hard science between scenes. Built for readers who will never open a database.</p>
+      <div class="tagrow"><span>Scroll-driven</span><span>Comic panels</span><span>Fact boxes</span></div>
+      <div class="scores">
+        <div class="score">Engagement <b>★★★★★</b></div>
+        <div class="score">Simplicity <b class="mid">★★★☆☆</b></div>
+        <div class="score">Story depth <b>★★★★★</b></div>
+        <div class="score">Build time <b>2–4 days</b></div>
+      </div>
+      <a class="open" href="02-graphic-novel.html">▸ Open concept 02</a>
+    </article>
+
+    <article class="idea" style="--ac:var(--c3)">
+      <div class="num">Concept 03</div>
+      <h2>Signal Lost</h2>
+      <div class="fmt">Podcast + interactive transcript</div>
+      <p>A six-episode audio chronicle with a working bottom-docked player, animated waveform state, and a full timestamped transcript for every episode — so the content is readable without sound. Includes accessibility-friendly text for deaf and hard-of-hearing audiences.</p>
+      <div class="tagrow"><span>Audio-first</span><span>Transcripts</span><span>Accessible</span></div>
+      <div class="scores">
+        <div class="score">Engagement <b class="mid">★★★☆☆</b></div>
+        <div class="score">Simplicity <b class="mid">★★★☆☆</b></div>
+        <div class="score">Story depth <b>★★★★★</b></div>
+        <div class="score">Build time <b>3–5 days*</b></div>
+      </div>
+      <a class="open" href="03-signal-lost-podcast.html">▸ Open concept 03</a>
+    </article>
+
+    <article class="idea" style="--ac:var(--c4)">
+      <div class="num">Concept 04</div>
+      <h2>The Silent Fleet</h2>
+      <div class="fmt">Interactive 3D timeline</div>
+      <p>A horizontally scrolling timeline on a perspective grid, with 3D-tilting cards that flip on hover and open detailed modals. Filter by Moon, Mars, deep space or “still active.” Closes with a full comparison table of every node.</p>
+      <div class="tagrow"><span>3D cards</span><span>Filters</span><span>Comparison table</span></div>
+      <div class="scores">
+        <div class="score">Engagement <b>★★★★★</b></div>
+        <div class="score">Simplicity <b class="mid">★★★☆☆</b></div>
+        <div class="score">Story depth <b class="mid">★★★★☆</b></div>
+        <div class="score">Build time <b>2–3 days</b></div>
+      </div>
+      <a class="open" href="04-silent-fleet-timeline.html">▸ Open concept 04</a>
+    </article>
+
+    <article class="idea" style="--ac:var(--c5)">
+      <div class="num">Concept 05 · FUSION</div>
+      <h2>The Deep Dive</h2>
+      <div class="fmt">Interactive comic × map × rarity descent</div>
+      <p><b>Original concept 05.</b> The approved three-concept fusion is now <a href="index.html" style="color:var(--c6)">The Ghost Atlas</a> on the main page. This version answers ten questions about abandoned hardware — every option carries a rarity, and <b>the rarer your answer, the deeper you fall</b>. Cross into a new zone and its comic chapter unlocks, while its map beacon lights up in the descent ladder on the left. Wrong answers cost one of three lives.</p>
+      <div class="tagrow"><span>Rarity descent</span><span>Unlockable comic</span><span>Live map beacons</span><span>3 lives</span></div>
+      <div class="scores">
+        <div class="score">Engagement <b>★★★★★</b></div>
+        <div class="score">Simplicity <b class="mid">★★☆☆☆</b></div>
+        <div class="score">Story depth <b>★★★★★</b></div>
+        <div class="score">Build time <b>3–5 days</b></div>
+      </div>
+      <a class="open" href="05-the-deep-dive.html">▸ Open original concept 05</a>
+    </article>
+    <article class="idea" style="--ac:var(--c6)">
+      <div class="num">Concept 06 · MAIN EXPERIENCE</div>
+      <h2>The Ghost Atlas</h2>
+      <div class="fmt">Comic × ghost map × learning system</div>
+      <p><b>Concepts 01 + 02 + 05, fully merged.</b> Read abandoned hardware as comic case files, type open-ended answers to verify the archive, and watch evidence pins cluster by zone. Three inference patterns unlock as the map fills — a John Snow-style learning system, not a fact list.</p>
+      <div class="tagrow"><span>Comic panels</span><span>Evidence map</span><span>Typed quiz</span><span>Inference check</span></div>
+      <div class="scores">
+        <div class="score">Engagement <b>★★★★★</b></div>
+        <div class="score">Simplicity <b class="mid">★★☆☆☆</b></div>
+        <div class="score">Story depth <b>★★★★★</b></div>
+        <div class="score">Replayability <b>★★★★★</b></div>
+      </div>
+      <a class="open" href="index.html">▸ Open main experience</a>
+    </article>
+    <article class="idea" style="--ac:var(--c5)">
+      <div class="num">Chapter Zero · STORY</div>
+      <h2>PATCHWORK</h2>
+      <div class="fmt">Seven-beat comic × live story hook</div>
+      <p><b>The story behind the map.</b> A salvage robot ordered to clear NASA's abandoned hardware cannot bring itself to throw any of it away, so it builds a companion — Patch — out of the junk. Seven comic panels with friendly binocular-eyed characters, a seven-line story board, and a full prose telling. Answers typed into the atlas are handed to Patch and become its first original sentence, so every reader gets a different ending.</p>
+      <div class="tagrow"><span>7 comic panels</span><span>Friendly characters</span><span>Reader-driven ending</span><span>Mobile-ready</span></div>
+      <a class="open" href="patchwork.html">▸ Read Chapter Zero</a>
+    </article>
+  </div>
+
+  <!-- ============ MATRIX ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>Side-by-side comparison</h2>
+      <p>Scored against the four things the judges actually reward: narrative focus, accuracy, accessibility for a younger audience, and how clearly it links engineering to science.</p>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead>
+          <tr>
+            <th>Criterion</th>
+            <th class="th1">01 · Ghost Map</th>
+            <th class="th2">02 · Graphic Novel</th>
+            <th class="th3">03 · Signal Lost</th>
+            <th class="th4">04 · Silent Fleet</th>
+            <th class="th5">05 · The Deep Dive</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Narrative focus</td>
+            <td><span class="stars">★★★<span class="off">★★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Accuracy of data</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+          </tr>
+          <tr>
+            <td>Accessibility (deaf / no-audio)</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+          </tr>
+          <tr>
+            <td>Engineering → science link</td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>“Wow” factor for kids</td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★<span class="off">★★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Runs offline / no dependencies</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Easy to extend with more missions</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★<span class="off">★★★</span></span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+          </tr>
+          <tr>
+            <td>Replayability</td>
+            <td><span class="stars">★★<span class="off">★★★</span></span></td>
+            <td><span class="stars">★<span class="off">★★★★</span></span></td>
+            <td><span class="stars">★★<span class="off">★★★</span></span></td>
+            <td><span class="stars">★★★<span class="off">★★</span></span></td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Time to a polished result</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★<span class="off">★★</span></span></td>
+            <td><span class="stars">★★★<span class="off">★★</span></span></td>
+            <td><span class="stars">★★★★<span class="off">★</span></span></td>
+            <td><span class="stars">★★★<span class="off">★★</span></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px;color:var(--muted);font-size:14px">The Ghost Atlas is not scored in this legacy comparison matrix because it is now the <a href="index.html" style="color:var(--c6)">live main experience</a>.</p>
+  </section>
+
+  <!-- ============ RECOMMENDATION ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>How to choose</h2>
+      <p>There is no single winner — the right pick depends on your team's skills and how much time you have before submission.</p>
+    </div>
+    <div class="rec">
+      <div class="recbox win">
+        <span class="badge">Live main experience · fusion</span>
+        <h3>Concept 06 — The Ghost Atlas</h3>
+        <p>Now the site's landing page. Merges the spatial beacon map (01), halftone comic panels (02) and the typed rarity-descent engine (05) into one evidence-driven learning loop.</p>
+        <ul>
+          <li><b>Live now:</b> open <a href="index.html" style="color:var(--c6)">index.html</a> or the site root</li>
+          <li><b>Why:</b> hits narrative, accuracy, accessibility <i>and</i> “wow factor” in one build</li>
+          <li><b>Risk:</b> most complex of the five — keep it to 10 questions and 7 chapters</li>
+        </ul>
+      </div>
+      <div class="recbox">
+        <span class="badge">Fastest route</span>
+        <h3>Concept 01 — Ghost Map</h3>
+        <p>Fastest route to something impressive, easiest to extend, and it hits the “accuracy” and “accessibility” criteria with no extra work.</p>
+        <ul>
+          <li><b>Best if:</b> you have 1–2 days, or a team with mixed skill levels</li>
+          <li><b>Then add:</b> a story chapter or audio layer from concepts 02/03</li>
+          <li><b>Risk:</b> weakest pure narrative — compensate with richer story text</li>
+        </ul>
+      </div>
+      <div class="recbox">
+        <span class="badge">Highest ceiling</span>
+        <h3>Concept 02 — Graphic Novel</h3>
+        <p>The most memorable answer to a storytelling challenge. Judges remember a story; they rarely remember a data table.</p>
+        <ul>
+          <li><b>Best if:</b> someone on your team can draw or design</li>
+          <li><b>Then add:</b> the map as a “where did this happen?” appendix</li>
+          <li><b>Risk:</b> takes the longest; scope it to 1 story, not 6</li>
+        </ul>
+      </div>
+      <div class="recbox">
+        <span class="badge">Safest hybrid</span>
+        <h3>Concept 04 — Silent Fleet</h3>
+        <p>Big visual impact, covers the most hardware, and the comparison table makes the science easy to judge quickly.</p>
+        <ul>
+          <li><b>Best if:</b> you want breadth over depth</li>
+          <li><b>Then add:</b> narrative captions per node from concept 02</li>
+          <li><b>Risk:</b> can feel like a list unless each node tells a real story</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NEXT STEPS ============ -->
+  <section>
+    <div class="sec-head">
+      <h2>What to do next</h2>
+      <p>Whatever you pick, these five steps apply. Run them in order.</p>
+    </div>
+    <ol class="steps">
+      <li><b>Pick a format and a target age group</b>These two decisions drive everything else. “School-age” is broad — commit to something like ages 10–14 and write to it.</li>
+      <li><b>Choose your hardware — 4 to 6 pieces maximum</b>Depth beats breadth. Four machines with real stories beat fifteen with blurbs. The templates above already contain a vetted set to draw from.</li>
+      <li><b>Wait for the Resources tab to open — Friday, November 13</b>The official datasets are not published yet. Re-check then and align your numbers to what NASA provides.</li>
+      <li><b>Verify every fact against a primary source</b>Accuracy is explicitly graded. Keep a spreadsheet of claim → source URL for each figure you publish.</li>
+      <li><b>Make the engineering → science link explicit</b>For every machine, answer: what was it built to do, what did it find, and why does that discovery matter to someone on Earth?</li>
+    </ol>
+
+  </section>
+
+  <footer>
+    Concept prototypes · 2026 NASA Space Apps Challenge · Challenge track: “Abandoned but not Forgotten”<br>
+    All six prototypes run offline with zero dependencies — just double-click to open.<br>
+The Ghost Atlas is also the site's main page (<a href="index.html" style="color:var(--c6)">index.html</a>). Its opening story is <a href="patchwork.html" style="color:var(--c6)">Chapter Zero: PATCHWORK</a>.<br>
+    NASA Space Apps is funded by NASA's Science Mission Directorate.
+  </footer>
+</div>
+</body>
+</html>

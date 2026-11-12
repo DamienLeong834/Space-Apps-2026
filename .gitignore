@@ -1,0 +1,14 @@
+# Netlify local state
+.netlify/
+
+# OS / OneDrive junk
+Thumbs.db
+desktop.ini
+~$*
+
+# Python
+__pycache__/
+*.pyc
+
+# Local staging / verification artifacts
+_netlify_publish/

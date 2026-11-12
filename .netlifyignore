@@ -1,0 +1,3 @@
+# Public-site exclusions: answer keys are authoring artifacts, not content.
+quiz-answers.md
+quiz-answers.csv

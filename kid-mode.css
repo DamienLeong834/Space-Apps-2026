@@ -1,0 +1,285 @@
+/* ============================================================
+   JUNIOR EXPLORER MODE  —  shared across the whole Silent Fleet site
+   For readers aged ~8-9. ON by default; "Classic view" restores the
+   original design without a reload (so quiz progress is never lost).
+
+   All visual rules are scoped to html.kid, so turning the mode off
+   leaves every page byte-for-byte itself again. The dock is present in
+   both modes so the switch is always reachable.
+   ============================================================ */
+
+html.kid{
+  --kid-round:"Trebuchet MS","Segoe UI Rounded","Chalkboard SE","Comic Sans MS",system-ui,-apple-system,sans-serif;
+  --cyan:#8de8ff; --gold:#ffdc63; --amber:#ffc070; --muted:#c4d2ef;
+  --line:rgba(168,198,244,.32); --rust:#e2662d; --sand:#ffd59b;
+  --green:#7cf3ad; --violet:#c3adff;
+}
+html.kid body{
+  font-family:var(--kid-round);
+  background:#101c33;
+  color:#f4f7ff;
+  letter-spacing:.005em;
+}
+html.kid a{color:#9be9ff}
+html.kid button{font-family:var(--kid-round)}
+
+/* ---------- friendlier, rounder headings ---------- */
+html.kid .mast h1{
+  font-family:var(--kid-round); font-size:clamp(36px,6.2vw,74px);
+  line-height:1.02; letter-spacing:-1.5px;
+  text-shadow:4px 4px 0 rgba(13,11,10,.45);
+}
+html.kid .mast h1 em{-webkit-text-stroke:1.5px var(--ink)}
+html.kid .issue, html.kid .meta, html.kid .hud .brand, html.kid .hud a.nav,
+html.kid .sec-head .k, html.kid .sec-head h2, html.kid .console h3,
+html.kid .console .stamp, html.kid .qnum, html.kid .ledger h4,
+html.kid .sitenav a, html.kid .takeaway h3, html.kid .beatbar{
+  font-family:var(--kid-round); letter-spacing:.06em;
+}
+html.kid .issue, html.kid .meta{letter-spacing:.12em}
+html.kid .sec-head h2{font-size:clamp(22px,2.7vw,30px); text-transform:none}
+html.kid .sec-head .k, html.kid .sec-head .note{font-size:12px; letter-spacing:.05em}
+html.kid .hud .lbl{font-size:11px; letter-spacing:.07em}
+html.kid .hud .val{font-size:24px}
+html.kid .mast .tagline{
+  font-family:var(--kid-round); font-style:normal;
+  font-size:clamp(15px,1.6vw,19px); line-height:1.6;
+}
+html.kid .mast-side{font-family:var(--kid-round); border-radius:18px}
+html.kid .mast-side summary{
+  font-family:var(--kid-round); font-size:15px;
+  letter-spacing:.03em; text-transform:none;
+}
+html.kid .mast-side .how-body ol{font-size:15px; line-height:1.85}
+html.kid .mast-side .mix{font-size:13px; line-height:1.6}
+
+/* ---------- bigger, calmer answer desk ---------- */
+html.kid .console{
+  border-radius:24px; border:4px solid var(--rust);
+  background:linear-gradient(180deg,#fffdf6,#fff0d9);
+  box-shadow:0 10px 0 rgba(226,102,45,.32);
+}
+html.kid .console h3{font-size:24px; text-transform:none}
+html.kid .console .sub{
+  font-family:var(--kid-round); font-style:normal;
+  font-size:14px; color:#5b4a38; line-height:1.6;
+}
+html.kid .qnum{font-size:13px; letter-spacing:.07em}
+html.kid .qtopic{font-size:12px; letter-spacing:.02em}
+html.kid .qtext{font-family:var(--kid-round); font-size:20px; line-height:1.42}
+/* 16px is deliberate: iOS does not zoom the page when the input is >= 16px */
+html.kid .qrow input{
+  font-family:var(--kid-round); font-size:16px; font-weight:600;
+  padding:14px; min-height:54px; border-radius:14px;
+}
+html.kid .qrow button{min-width:58px; min-height:54px; border-radius:14px; font-size:22px}
+html.kid .timer{border-radius:99px; height:12px; overflow:hidden}
+html.kid .explain, html.kid .patchbag, html.kid .rar span{font-family:var(--kid-round)}
+html.kid .explain{font-size:15px; line-height:1.6}
+html.kid .patchbag{border-radius:16px; font-size:14px}
+html.kid .rar span{font-size:11px}
+html.kid .next, html.kid .begin, html.kid .again{
+  font-family:var(--kid-round); font-size:17px; min-height:54px;
+  border-radius:16px; letter-spacing:.01em;
+}
+html.kid .lens button{
+  font-family:var(--kid-round); font-size:14px;
+  min-height:44px; padding:9px 17px;
+}
+html.kid .mapcard{border-radius:24px; border:2px solid rgba(168,198,244,.4)}
+html.kid .panhint, html.kid .mapfoot{font-family:var(--kid-round); font-size:13px; line-height:1.7}
+html.kid .ledger, html.kid .method, html.kid .quizlet, html.kid .notes{border-radius:22px}
+html.kid .ledger .method p, html.kid .ledger-note, html.kid .quizlet p,
+html.kid .notes li, html.kid .steps span, html.kid .objectives span{
+  font-family:var(--kid-round); font-size:14px; line-height:1.7;
+}
+html.kid .card, html.kid .takeaway, html.kid .castcard{border-radius:22px}
+html.kid .sitenav a{font-size:13px; letter-spacing:.03em}
+/* little fingers: every close button becomes a comfortable 44px target */
+html.kid .x{min-width:44px; min-height:44px; font-size:18px; border-radius:12px}
+
+/* ---------- comic reading text (never inside the artwork) ---------- */
+html.kid .frame > .cap{font-family:var(--kid-round); font-size:14px; line-height:1.55}
+html.kid .dialog .bub{font-family:var(--kid-round); font-size:13.5px; line-height:1.45}
+html.kid .story p, html.kid .takeaway > p{
+  font-family:var(--kid-round); font-size:15.5px; line-height:1.8;
+}
+
+/* ---------- Patch's welcome strip (built by kid-mode.js) ---------- */
+.kidintro{display:none}
+html.kid .kidintro{
+  display:grid; grid-template-columns:84px minmax(0,1fr); gap:16px;
+  align-items:center; width:100%; max-width:100%; min-width:0;
+  margin:0 0 22px; padding:16px 18px;
+  background:linear-gradient(115deg,#fff7e2,#ffe4bf); color:#3a2a1c;
+  border:5px solid #e2662d; border-radius:26px;
+  box-shadow:0 8px 0 rgba(226,102,45,.3);
+  font-family:"Trebuchet MS","Segoe UI Rounded",system-ui,sans-serif;
+}
+html.kid .kidintro .kidface{width:84px; height:84px; max-width:100%}
+html.kid .kidintro h2{font-size:23px; line-height:1.2; margin-bottom:4px; color:#b5440f}
+html.kid .kidintro p{font-size:15px; line-height:1.55; margin-bottom:9px}
+html.kid .kidintro ol{display:flex; flex-wrap:wrap; gap:7px; list-style:none; margin:0; padding:0}
+html.kid .kidintro li{
+  font-size:13px; font-weight:700; background:#fffaf0; color:#4a3524;
+  border:2px dashed #e2a06c; border-radius:999px; padding:5px 11px;
+}
+
+/* ---------- floating Patch dock (both modes) ---------- */
+.kiddock{
+  position:fixed; z-index:70; right:14px;
+  bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  width:min(238px,calc(100vw - 28px)); max-width:calc(100vw - 28px);
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+  font-family:"Trebuchet MS","Segoe UI Rounded",system-ui,sans-serif;
+  pointer-events:none;
+}
+.kiddock > *{pointer-events:auto}
+.kidrow{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  justify-content:flex-end; max-width:100%;
+}
+.kidswitch, .kidjar{
+  font-family:inherit; font-size:12px; font-weight:800; line-height:1.25;
+  border:3px solid #12141f; border-radius:999px; padding:8px 13px;
+  background:#fff7e2; color:#3a2a1c; box-shadow:0 4px 0 #12141f;
+  cursor:pointer; white-space:nowrap; max-width:100%;
+}
+.kidjar{background:#ffe08a; cursor:default}
+.kidswitch[aria-pressed="false"]{background:#dee6f6; color:#3c4763}
+.kidswitch:hover{transform:translateY(-2px)}
+/* Collapsed junior mode = one round buddy, so it never sits on top of a line
+   of text. Pills only appear while Patch's bubble is open. */
+.kiddock:not(.open):not(.classic) .kidrow{display:none}
+.kidbuddywrap{position:relative; width:62px; height:62px; flex:0 0 auto}
+.kidbuddy{
+  width:100%; height:100%; border-radius:50%; padding:0;
+  border:4px solid #12141f; background:#ffe4bd; box-shadow:0 5px 0 #12141f;
+  cursor:pointer; display:grid; place-items:center; overflow:hidden;
+}
+.kidbuddy svg{width:100%; height:100%; display:block}
+.kidfullface, .kidtabface{display:block; width:100%; height:100%}
+.kidtabface{display:none}
+.kidbuddy:hover{transform:translateY(-2px) rotate(-4deg)}
+.kidstarbadge{
+  position:absolute; right:-7px; top:-7px; min-width:25px; height:25px;
+  padding:0 5px; border:2px solid #12141f; border-radius:999px;
+  background:#ffe08a; color:#33281e; font-size:11px; font-weight:900;
+  display:grid; place-items:center; box-shadow:0 2px 0 #12141f;
+}
+.kiddock.classic .kidbuddywrap{display:none}
+.kidbubble{
+  display:none; width:100%; max-width:100%; box-sizing:border-box;
+  background:#fffaf0; color:#33281e; border:4px solid #12141f; border-radius:20px;
+  padding:12px 13px; box-shadow:0 7px 0 #12141f;
+  font-size:13.5px; line-height:1.55;
+  max-height:min(46vh,330px); overflow:auto;
+}
+.kiddock.open .kidbubble{display:block}
+.kidbubble b{color:#b5440f}
+.kidbubble .kidwho{
+  display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  color:#b5440f; font-weight:900; margin-bottom:5px;
+}
+.kidbubble .kidmsg{overflow-wrap:anywhere}
+.kidbtns{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.kidbtns button, .kiduse{
+  font-family:inherit; font-size:12px; font-weight:800; cursor:pointer;
+  border:2px solid #12141f; border-radius:999px; padding:7px 11px;
+  background:#ffe08a; color:#33281e;
+}
+.kidbtns button:hover, .kiduse:hover{background:#ffc95c}
+.kiddock.classic .kidbuddy, .kiddock.classic .kidjar,
+.kiddock.classic .kidbubble{display:none}
+body.modal-open .kiddock{display:none}
+
+.kidtoast{
+  position:fixed; z-index:120; top:calc(12px + env(safe-area-inset-top,0px)); left:50%;
+  transform:translate(-50%,-160%); opacity:0;
+  background:#fffaf0; color:#33281e; border:4px solid #12141f; border-radius:999px;
+  padding:11px 20px;
+  font-family:"Trebuchet MS","Segoe UI Rounded",system-ui,sans-serif;
+  font-size:15px; font-weight:800; box-shadow:0 6px 0 #12141f;
+  max-width:calc(100vw - 28px); text-align:center; pointer-events:none;
+  transition:transform .35s cubic-bezier(.2,1.3,.4,1), opacity .3s;
+}
+.kidtoast.show{transform:translate(-50%,0); opacity:1}
+
+@media(max-width:640px){
+  /* narrow-screen layout fixes (apply in both views):
+     - 300px grid minimum spilled 4px off the concept archive at 320px
+     - the timeline's wide summary table had no horizontal scroll container */
+  .rec{grid-template-columns:minmax(0,1fr)}
+  .summary{overflow-x:auto}
+  .kiddock{
+    right:10px; bottom:calc(10px + env(safe-area-inset-bottom,0px));
+    width:min(206px,calc(100vw - 20px)); gap:6px;
+  }
+  .kidswitch, .kidjar{font-size:11px; padding:7px 10px; border-width:2px}
+  .kidbuddywrap{width:52px; height:52px}
+  .kidbuddy{border-width:3px}
+  .kidstarbadge{min-width:22px; height:22px; font-size:10px; right:-5px; top:-5px}
+  .kidbubble{font-size:13px; padding:11px; max-height:38vh}
+  .kidtoast{font-size:13px; padding:9px 14px}
+  html.kid .kidintro{grid-template-columns:1fr; padding:14px; gap:8px}
+  html.kid .kidintro .kidface{display:none}
+  html.kid .kidintro h2{font-size:20px}
+  html.kid .kidintro p{font-size:14px}
+  html.kid .kidintro li{font-size:12px; padding:4px 9px}
+  html.kid .qtext{font-size:18px}
+  html.kid .console .sub{font-size:13px}
+  html.kid .frame > .cap{font-size:13px}
+  html.kid .dialog .bub{font-size:12.5px}
+}
+/* ---------- reading pages: a tidy edge tab, never over words ----------
+   Story, comic, archive and standalone-quiz pages carry text right up to the
+   right-hand edge. A 52-62px floating face sat on top of the last words of a
+   line (the same "blocking" problem the reader flagged on the comic panels).
+   Collapsed, Patch becomes a small rounded tab pinned to the right edge with
+   its OWN complete mini face. The old approach clipped a 26px sliver out of
+   the big face, which read as a chopped-off head with a chevron on its eye.
+   The visible tab stays only 26px wide (the right-hand gutter on these pages)
+   so no word is covered; the button's extra 20px is a transparent hit area,
+   giving a 46x64px target that is easy for a child to tap. One tap slides the
+   whole dock back in. The atlas keeps the full round buddy. */
+.kiddock.reading:not(.open):not(.classic){
+  right:0; width:46px; gap:0;
+}
+.kiddock.reading:not(.open):not(.classic) .kidbuddywrap{
+  width:46px; height:64px; clip-path:none;
+}
+.kiddock.reading:not(.open):not(.classic) .kidbuddy{
+  position:relative; width:46px; height:64px;
+  border:0; border-radius:0; background:transparent;
+  box-shadow:none; overflow:visible;
+}
+.kiddock.reading:not(.open):not(.classic) .kidbuddy::before{
+  content:''; position:absolute; right:0; top:0;
+  width:26px; height:64px; box-sizing:border-box;
+  border:3px solid #12141f; border-right:0;
+  border-radius:14px 0 0 14px; background:#ffe4bd;
+  box-shadow:-3px 5px 0 #12141f;
+}
+.kiddock.reading:not(.open):not(.classic) .kidbuddy:hover{
+  transform:none;
+}
+.kiddock.reading:not(.open):not(.classic) .kidbuddy:hover::before{
+  filter:brightness(1.07);
+}
+.kiddock.reading:not(.open):not(.classic) .kidfullface{display:none}
+.kiddock.reading:not(.open):not(.classic) .kidtabface{
+  display:block; position:absolute; right:0; top:0;
+  width:26px; height:64px; z-index:1; pointer-events:none;
+}
+.kiddock.reading:not(.open):not(.classic) .kidstarbadge{
+  right:1px; left:auto; top:-8px; min-width:17px; height:17px;
+  font-size:9px; border-width:2px; box-shadow:0 2px 0 #12141f;
+}
+.kiddock.reading:not(.open):not(.classic) .kidbuddywrap::after{content:none}
+.kiddock.reading.open .kidbuddywrap{clip-path:none}
+@media(prefers-reduced-motion:reduce){
+  .kidtoast, .kidswitch, .kidbuddy, .kidbuddywrap{transition:none!important}
+}
+@media print{
+  .kiddock, .kidtoast, .kidintro{display:none!important}
+}

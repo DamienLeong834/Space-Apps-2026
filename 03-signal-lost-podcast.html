@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGNAL LOST — An Audio Chronicle</title>
+<style>
+  :root{
+    --bg:#0a0908; --surface:#14110e; --surface2:#1c1815;
+    --amber:#f5a623; --amber-dim:#8a5c14;
+    --text:#e9e2d6; --muted:#8d8375; --line:#2c2721;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    padding-bottom:180px;
+    background-image:
+      repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.012) 2px 4px);
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 22px}
+
+  /* ---------- MASTHEAD ---------- */
+  header{padding:56px 0 34px; border-bottom:1px solid var(--line)}
+  .freq{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.3em;
+    color:var(--amber); text-transform:uppercase; display:flex;
+    align-items:center; gap:12px; margin-bottom:20px;
+  }
+  .freq::before{content:""; width:34px; height:1.5px; background:var(--amber)}
+  h1{
+    font-size:clamp(42px,9vw,96px); font-weight:900; line-height:.88;
+    letter-spacing:-3px; text-transform:uppercase;
+  }
+  h1 .lost{
+    color:transparent; -webkit-text-stroke:2px var(--amber);
+    display:block;
+  }
+  .tag{
+    margin-top:22px; font-size:clamp(15px,2vw,19px); color:var(--muted);
+    max-width:64ch; line-height:1.65;
+  }
+  .tag b{color:var(--text); font-weight:600}
+  .meta{
+    display:flex; gap:26px; flex-wrap:wrap; margin-top:26px;
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.12em;
+  }
+  .meta span b{color:var(--amber); font-weight:600}
+
+  /* ---------- SEASON / EPISODES ---------- */
+  .season{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin:44px 0 8px; padding-bottom:12px; border-bottom:1px solid var(--line);
+  }
+  .season h2{font-size:13px; font-family:var(--mono); letter-spacing:.28em; text-transform:uppercase; color:var(--amber)}
+  .season .count{font-family:var(--mono); font-size:11.5px; color:var(--muted)}
+
+  .ep{
+    display:grid; grid-template-columns:64px 1fr auto; gap:20px;
+    align-items:center; padding:22px 16px; border-bottom:1px solid var(--line);
+    cursor:pointer; transition:.2s; position:relative;
+  }
+  .ep:hover{background:var(--surface2)}
+  .ep.playing{background:linear-gradient(90deg,rgba(245,166,35,.11),transparent 70%)}
+  .ep.playing::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--amber);
+  }
+  .ep .num{
+    font-family:var(--mono); font-size:26px; color:#3a342c;
+    font-weight:700; text-align:center; transition:.2s;
+  }
+  .ep:hover .num{color:var(--amber-dim)}
+  .ep.playing .num{color:var(--amber)}
+  .ep h3{font-size:17.5px; font-weight:700; margin-bottom:5px; letter-spacing:-.2px}
+  .ep.playing h3{color:var(--amber)}
+  .ep .desc{font-size:13.5px; color:var(--muted); line-height:1.55}
+  .ep .desc b{color:#b8ad9c; font-weight:600}
+  .ep .rt{
+    font-family:var(--mono); font-size:12px; color:var(--muted);
+    text-align:right; white-space:nowrap;
+  }
+  .ep .rt .pill{
+    display:block; margin-top:7px; font-size:9.5px; letter-spacing:.14em;
+    padding:3px 7px; border:1px solid var(--line); border-radius:3px;
+    text-transform:uppercase; color:#6f675c;
+  }
+  .ep .rt .pill.live{color:#5fd79b; border-color:#2c5c46}
+  .eq{display:none; gap:2.5px; align-items:flex-end; height:16px; margin-top:7px; justify-content:flex-end}
+  .ep.playing .eq{display:flex}
+  .eq i{width:3px; background:var(--amber); animation:eq .9s ease-in-out infinite}
+  .eq i:nth-child(1){height:40%;animation-delay:0s}
+  .eq i:nth-child(2){height:100%;animation-delay:.15s}
+  .eq i:nth-child(3){height:60%;animation-delay:.3s}
+  .eq i:nth-child(4){height:85%;animation-delay:.45s}
+  @keyframes eq{50%{transform:scaleY(.3)}}
+
+  /* ---------- TRANSCRIPT PANEL ---------- */
+  .transcript{
+    margin:34px 0 10px; border:1px solid var(--line); background:var(--surface);
+    border-radius:6px; overflow:hidden;
+  }
+  .transcript .th{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 20px; border-bottom:1px solid var(--line);
+    font-family:var(--mono); font-size:11px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--amber);
+  }
+  .transcript .th span:last-child{color:var(--muted); letter-spacing:.1em}
+  .transcript .tb{padding:22px 24px; max-height:340px; overflow-y:auto}
+  .line{display:grid; grid-template-columns:74px 1fr; gap:16px; margin-bottom:15px; align-items:start}
+  .line time{font-family:var(--mono); font-size:11.5px; color:var(--amber-dim); padding-top:3px}
+  .line p{font-size:14.5px; line-height:1.65; color:#cfc6b8}
+  .line p b{color:var(--amber); font-weight:600}
+  .line em{color:var(--muted); font-style:italic}
+  .note{
+    margin-top:20px; padding:15px 18px; background:rgba(245,166,35,.07);
+    border-left:3px solid var(--amber); font-size:13.5px; color:#e0cfae; line-height:1.6;
+  }
+  .note b{color:var(--amber)}
+
+  /* ---------- DATA STRIP ---------- */
+  .datastrip{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:1px; background:var(--line); border:1px solid var(--line);
+    margin:34px 0; border-radius:6px; overflow:hidden;
+  }
+  .datastrip div{background:var(--surface); padding:20px 18px}
+  .datastrip b{
+    display:block; font-family:var(--mono); font-size:27px;
+    color:var(--amber); font-weight:700; letter-spacing:-1px;
+  }
+  .datastrip span{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.12em}
+
+  .closing{
+    border-top:1px solid var(--line); margin-top:44px; padding-top:34px;
+    color:var(--muted); font-size:15px; line-height:1.75; max-width:70ch;
+  }
+  .closing b{color:var(--text)}
+  .closing a{color:var(--amber); text-decoration:none; border-bottom:1px solid var(--amber-dim)}
+  .disclaim{
+    margin-top:26px; font-family:var(--mono); font-size:11.5px;
+    color:#5c554b; line-height:1.7;
+  }
+
+  /* ---------- PLAYER ---------- */
+  .player{
+    position:fixed; left:0; right:0; bottom:0; z-index:80;
+    background:rgba(14,12,10,.96); border-top:1px solid var(--amber-dim);
+    backdrop-filter:blur(14px);
+    transform:translateY(110%); transition:transform .35s cubic-bezier(.2,.9,.3,1);
+  }
+  .player.up{transform:none}
+  .player .bar{height:3px; background:#241f19; cursor:pointer; position:relative}
+  .player .bar i{position:absolute; left:0; top:0; bottom:0; background:var(--amber); width:0%}
+  .player .bar i::after{
+    content:""; position:absolute; right:-5px; top:50%; transform:translateY(-50%);
+    width:11px; height:11px; border-radius:50%; background:var(--amber);
+    box-shadow:0 0 12px var(--amber);
+  }
+  .pc{
+    display:grid; grid-template-columns:auto 1fr auto; gap:22px;
+    align-items:center; padding:16px 24px; max-width:1100px; margin:0 auto;
+  }
+  .pbtns{display:flex; gap:10px; align-items:center}
+  .pbtns button{
+    background:none; border:1px solid var(--line); color:var(--text);
+    width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:15px;
+    transition:.18s; font-family:var(--mono);
+  }
+  .pbtns button:hover{border-color:var(--amber); color:var(--amber)}
+  .pbtns .main{
+    width:54px; height:54px; background:var(--amber); color:#14110e;
+    border:0; font-size:19px; font-weight:700;
+    box-shadow:0 0 26px rgba(245,166,35,.45);
+  }
+  .pbtns .main:hover{color:#14110e; transform:scale(1.06)}
+  .pinfo{min-width:0}
+  .pinfo .lbl{font-family:var(--mono); font-size:10px; letter-spacing:.24em; color:var(--amber); text-transform:uppercase}
+  .pinfo .ttl{font-size:15px; font-weight:700; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .pinfo .sub{font-size:12.5px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .ptime{font-family:var(--mono); font-size:12.5px; color:var(--muted); white-space:nowrap}
+  .ptime b{color:var(--amber); font-weight:600}
+
+  @media(max-width:720px){
+    .ep{grid-template-columns:44px 1fr; gap:14px}
+    .ep .rt{grid-column:2; text-align:left; display:flex; gap:12px; align-items:center}
+    .pc{grid-template-columns:auto 1fr; gap:14px; padding:14px 16px}
+    .ptime{display:none}
+    .pinfo .sub{display:none}
+  }
+</style>
+<link rel="stylesheet" href="kid-mode.css">
+<script src="kid-mode.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="freq">Deep Space Network · Recording Archive</div>
+    <h1>SIGNAL<span class="lost">LOST</span></h1>
+    <p class="tag">An audio chronicle of the machines NASA left behind. <b>Six episodes. Six silent spacecraft.</b> Each one is still sitting exactly where it stopped working — and each one changed what we know about the solar system.</p>
+    <div class="meta">
+      <span>Season <b>01</b></span>
+      <span>Episodes <b>06</b></span>
+      <span>Runtime <b>38 min</b></span>
+      <span>Target <b>Ages 10+</b></span>
+      <span>Format <b>Interactive transcript</b></span>
+    </div>
+  </header>
+
+  <div class="season">
+    <h2>Season One — Machines Gone Quiet</h2>
+    <div class="count">Select an episode to play</div>
+  </div>
+
+  <div id="episodes"></div>
+
+  <!-- ============ FEATURED TRANSCRIPT ============ -->
+  <div class="transcript">
+    <div class="th"><span id="trTitle">Transcript · Episode 04</span><span id="trTime">00:00 – 06:20</span></div>
+    <div class="tb" id="trBody"></div>
+  </div>
+
+  <div class="datastrip">
+    <div><b>6</b><span>Machines profiled</span></div>
+    <div><b>48</b><span>Years of missions</span></div>
+    <div><b>1,300+</b><span>Marsquakes recorded</span></div>
+    <div><b>2</b><span>Still transmitting</span></div>
+  </div>
+
+  <p class="closing">
+    <b>The point of this series:</b> when a mission ends, the hardware doesn't disappear. It becomes a landmark, a long-term science record, and a story nobody has told properly yet. These episodes translate mission logs into narrative — what the machine was built to do, what it actually found, and why its silence matters.
+    <br><br>Want the map version? <a href="01-ghost-rover-map.html">Open the interactive Ghost Map →</a>
+  </p>
+
+  <p class="disclaim">
+    Educational prototype · 2026 NASA Space Apps Challenge<br>
+    All mission facts drawn from published NASA/JPL records. Transcript text is an original narrative, not an official recording. Verify figures against the Resources tab before submission.
+  </p>
+</div>
+
+<!-- ============ PLAYER ============ -->
+<div class="player" id="player">
+  <div class="bar" id="bar"><i id="fill"></i></div>
+  <div class="pc">
+    <div class="pbtns">
+      <button id="prev" aria-label="Previous">⏮</button>
+      <button class="main" id="play" aria-label="Play/Pause">▶</button>
+      <button id="next" aria-label="Next">⏭</button>
+    </div>
+    <div class="pinfo">
+      <div class="lbl">Now playing</div>
+      <div class="ttl" id="pTitle">—</div>
+      <div class="sub" id="pSub">—</div>
+    </div>
+    <div class="ptime"><b id="pNow">0:00</b> / <span id="pDur">0:00</span></div>
+  </div>
+</div>
+
+<script>
+const EPS=[
+  {n:"01",t:"The Buggy That Refused to Die",rt:"06:10",live:false,
+   d:"Sojourner, 650 grams, <b>Ares Vallis</b>. It rolled off the lander and proved a wheeled vehicle could drive on another planet.",
+   lines:[
+    ["00:00","<b>Narrator:</b> July 1997. A microwave-oven-sized rover drops onto the Martian flood plain, and the world watches it move nine metres."],
+    ["00:34","<b>Narrator:</b> Sojourner weighed 650 grams. Its whole job was to answer one question: can we drive on Mars at all?"],
+    ["01:12","<b>Narrator:</b> Its spectrometer found that the rocks at Ares Vallis had been moved and shaped by water. Flood-borne rocks, on another world."],
+    ["02:40","<b>Narrator:</b> It survived three times longer than planned, then went quiet — its battery could not outlast a Martian night."],
+    ["04:05","<b>Narrator:</b> Every rover since — Spirit, Opportunity, Curiosity, Perseverance — is a descendant of that 650-gram machine."]
+   ],
+   note:"<b>The science:</b> Sojourner confirmed flood-shaped rocks at Ares Vallis, giving the first rover-scale evidence that water once flowed on Mars."},
+
+  {n:"02",t:"Six Wheels, One Broken Leg",rt:"07:05",live:false,
+   d:"Spirit spent six years in <b>Gusev Crater</b> — then drove backwards with a seized wheel and kept going.",
+   lines:[
+    ["00:00","<b>Narrator:</b> Landed January 2004 for a 90-day mission. It worked for six years."],
+    ["00:48","<b>Narrator:</b> In 2009 the right front wheel jammed. Engineers had an idea: drag it. Use the dead wheel as a plough."],
+    ["01:55","<b>Narrator:</b> That broken wheel dug trenches into the soil — and uncovered bright silica, pure silicon dioxide."],
+    ["03:10","<b>Narrator:</b> Silica like that forms in hot springs or steam vents. Warm, wet, chemically active — exactly the environment that could support life."],
+    ["05:20","<b>Narrator:</b> Spirit climbed the Columbia Hills, and in 2010 its wheels sank into soft soil and never moved again."]
+   ],
+   note:"<b>The science:</b> Spirit's dragged wheel exposed silica deposits indicating ancient hot-spring or steam-vent activity in Gusev Crater."},
+
+  {n:"03",t:"Fifteen Years of Blueberries",rt:"08:15",live:false,
+   d:"Opportunity was built for <b>90 days</b> and lasted 15 years. Its discovery: Mars had an ancient sea.",
+   lines:[
+    ["00:00","<b>Narrator:</b> Opportunity landed on Meridiani Planatum in January 2004. The plan was three months."],
+    ["00:52","<b>Narrator:</b> Sol 33. The rover points its spectrometer at a small grey sphere and the mission changes."],
+    ["01:40","<b>Narrator:</b> Hematite. Thousands of them, scattered across the plain like dropped beads — and hematite forms in water."],
+    ["03:00","<b>Narrator:</b> Then Endurance Crater: layered rock, each band a page in a record 100 million years older than the surface above."],
+    ["05:10","<b>Narrator:</b> Forty-five kilometres. More than a thousand solar-panel cleanings from wind. Fifteen years."],
+    ["06:40","<b>Narrator:</b> June 2018 — a planet-engulfing dust storm. Sunlight drops below one percent. The battery drains."],
+    ["07:30","<b>Narrator:</b> NASA tries more than a thousand times to call. There is no answer."]
+   ],
+   note:"<b>The science:</b> Opportunity proved Meridiani Planatum was once covered by liquid water, using hematite spherules, sulfate minerals and sedimentary layering."},
+
+  {n:"04",t:"My Battery Is Low",rt:"06:20",live:false,
+   d:"The final transmission from <b>Opportunity</b> — and why a rover's last words were never meant for us.",
+   lines:[
+    ["00:00","<b>Narrator:</b> The sentence the whole world remembers — “my battery is low and it's getting dark” — was never a radio message."],
+    ["00:46","<b>Narrator:</b> It was a paraphrase, offered by a NASA scientist to explain what the engineering data meant."],
+    ["01:38","<b>Narrator:</b> And that is the whole problem this challenge is about. The data was there. The story wasn't."],
+    ["02:50","<b>Narrator:</b> On Mars there is no wind to clean a panel by rain, no one to wipe the lens. Dust simply accumulates."],
+    ["04:02","<b>Narrator:</b> InSight died the same way in 2022 — dust on the panels, sunlight gone, the clock running down."],
+    ["05:15","<b>Narrator:</b> The machines stay exactly where they stopped. Meridiani still holds two sets of tracks. Nobody will ever erase them."]
+   ],
+   note:"<b>Why it matters:</b> the hardware is preserved by the environment it died in. On the Moon and Mars, abandonment is permanent — which is what makes these sites worth telling stories about."},
+
+  {n:"05",t:"The Lander That Never Moved",rt:"06:45",live:false,
+   d:"<b>InSight</b> planted a seismometer and listened for four years. It heard more than 1,300 marsquakes.",
+   lines:[
+    ["00:00","<b>Narrator:</b> InSight was not a rover. It could not move. It landed, placed one instrument, and never travelled a metre."],
+    ["00:50","<b>Narrator:</b> A robotic arm set a seismometer under a wind-and-heat shield on Elysium Planitia, then folded away forever."],
+    ["01:44","<b>Narrator:</b> Four years of listening produced more than 1,300 confirmed marsquakes — proof that Mars is still geologically alive."],
+    ["03:20","<b>Narrator:</b> From those vibrations scientists measured the size of the core and the thickness of the crust. We learned what is inside Mars."],
+    ["04:48","<b>Narrator:</b> Dust was slower to kill here, but it was inevitable. By late 2022 the panels could no longer charge the battery."],
+    ["05:40","<b>Narrator:</b> In December 2022 NASA sent a final command and listened one last time. Nothing came back."]
+   ],
+   note:"<b>The science:</b> InSight revealed Mars's internal structure — core size, crust thickness and mantle — and showed the planet is not geologically dead."},
+
+  {n:"06",t:"Still Talking",rt:"09:30",live:true,
+   d:"Two <b>Voyagers</b>, launched in 1977, are in interstellar space right now — and they are not abandoned.",
+   lines:[
+    ["00:00","<b>Narrator:</b> Not every old machine is silent. Two of them are still transmitting from interstellar space."],
+    ["01:05","<b>Narrator:</b> Voyager 1 and Voyager 2 launched in 1977. Their signals take roughly 22 hours to reach Earth."],
+    ["02:30","<b>Narrator:</b> Each carries the Golden Record — sounds and pictures of Earth, in case anything ever finds it."],
+    ["04:15","<b>Narrator:</b> They confirmed ocean worlds at Jupiter and Saturn, and discovered active volcanoes on Io."],
+    ["06:00","<b>Narrator:</b> The Voyagers are the exception that proves the rule: everything else we send out eventually stops."],
+    ["07:45","<b>Narrator:</b> When they do fall silent, they will keep travelling — the longest-lasting objects humanity has ever made."]
+   ],
+   note:"<b>The contrast:</b> Voyager is the counter-example. It shows audiences what 'abandoned' means by showing what it looks like when a machine outlives everyone who built it."}
+];
+
+const epWrap=document.getElementById('episodes');
+EPS.forEach((e,i)=>{
+  const el=document.createElement('div');
+  el.className='ep'; el.id='ep'+i; el.tabIndex=0; el.setAttribute('role','button');
+  el.innerHTML=`
+    <div class="num">${e.n}</div>
+    <div>
+      <h3>${e.t}</h3>
+      <div class="desc">${e.d}</div>
+    </div>
+    <div class="rt">${e.rt}
+      <span class="pill ${e.live?'live':''}">${e.live?'Still transmitting':'Signal lost'}</span>
+      <div class="eq"><i></i><i></i><i></i><i></i></div>
+    </div>`;
+  el.onclick=()=>play(i);
+  el.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();play(i)}};
+  epWrap.appendChild(el);
+});
+
+let cur=-1, playing=false, pos=0, timer=null;
+const player=document.getElementById('player'),
+      fill=document.getElementById('fill'),
+      playBtn=document.getElementById('play');
+
+function toSec(t){const[m,s]=t.split(':').map(Number);return m*60+s}
+function fmt(sec){const m=Math.floor(sec/60),s=Math.floor(sec%60);return m+':'+String(s).padStart(2,'0')}
+
+function showTranscript(i){
+  const e=EPS[i];
+  document.getElementById('trTitle').textContent=`Transcript · Episode ${e.n}`;
+  document.getElementById('trTime').textContent=`00:00 – ${e.rt}`;
+  document.getElementById('trBody').innerHTML=
+    e.lines.map(l=>`<div class="line"><time>${l[0]}</time><p>${l[1]}</p></div>`).join('')
+    +`<div class="note">${e.note}</div>`;
+  document.querySelector('.transcript').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function play(i){
+  if(i!==cur){ cur=i; pos=0;
+    document.getElementById('pTitle').textContent=EPS[i].t;
+    document.getElementById('pSub').textContent=`Episode ${EPS[i].n} · ${EPS[i].live?'Still transmitting':'Signal lost'}`;
+    document.getElementById('pDur').textContent=EPS[i].rt;
+    showTranscript(i);
+  }
+  document.querySelectorAll('.ep').forEach(x=>x.classList.remove('playing'));
+  document.getElementById('ep'+i).classList.add('playing');
+  player.classList.add('up');
+  playing=true; playBtn.textContent='❚❚';
+  tick();
+}
+function toggle(){ if(cur<0) play(0);
+  else { playing=!playing; playBtn.textContent=playing?'❚❚':'▶'; tick(); }
+}
+function tick(){
+  clearInterval(timer);
+  if(!playing) return;
+  timer=setInterval(()=>{
+    const dur=toSec(EPS[cur].rt);
+    pos+=1;
+    if(pos>=dur){ pos=dur; playing=false; playBtn.textContent='▶'; clearInterval(timer); }
+    fill.style.width=(pos/dur*100)+'%';
+    document.getElementById('pNow').textContent=fmt(pos);
+  },1000);
+}
+playBtn.onclick=toggle;
+document.getElementById('next').onclick=()=>play((cur+1)%EPS.length);
+document.getElementById('prev').onclick=()=>play((cur-1+EPS.length)%EPS.length);
+document.getElementById('bar').onclick=ev=>{
+  const r=ev.currentTarget.getBoundingClientRect();
+  pos=Math.round((ev.clientX-r.left)/r.width*toSec(EPS[cur].rt));
+  fill.style.width=((ev.clientX-r.left)/r.width*100)+'%';
+  document.getElementById('pNow').textContent=fmt(pos);
+};
+
+showTranscript(3);
+</script>
+</body>
+</html>

@@ -1,0 +1,2284 @@
+/* GENERATED FILE - do not edit by hand.
+   Source of truth: quiz-data.json
+   Regenerate with: python sync-quiz.py
+   This shim keeps the page working over file:// (fetch of local JSON
+   is blocked by browsers). On http(s) the live JSON is fetched instead. */
+window.QUIZ_DATA = {
+  "version": 1,
+  "questions": [
+    {
+      "id": "q01",
+      "zone": 3,
+      "topic": "Cislunar space",
+      "prompt": "Name a NASA spacecraft that has orbited the Moon.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Apollo 11 command/service module Columbia",
+          "match": [
+            "apollo 11",
+            "columbia",
+            "command module",
+            "service module",
+            "csm"
+          ],
+          "rarity": 8,
+          "note": "Columbia stayed in lunar orbit in July 1969 while Armstrong and Aldrin descended to the surface."
+        },
+        {
+          "display": "Apollo 8",
+          "match": [
+            "apollo 8",
+            "apollo viii",
+            "apollo8",
+            "first lunar orbit"
+          ],
+          "rarity": 16,
+          "note": "In December 1968 its crew became the first humans to orbit the Moon."
+        },
+        {
+          "display": "Lunar Reconnaissance Orbiter",
+          "match": [
+            "lro",
+            "lunar reconnaissance orbiter",
+            "reconnaissance orbiter",
+            "lro spacecraft"
+          ],
+          "rarity": 26,
+          "note": "It has mapped the Moon from polar orbit since 2009 and photographed the Apollo landing sites."
+        },
+        {
+          "display": "Apollo 10",
+          "match": [
+            "apollo 10",
+            "apollo x",
+            "snoopy",
+            "dress rehearsal"
+          ],
+          "rarity": 36,
+          "note": "Its crew flew the lunar module to within about 15 km of the surface in May 1969 as a full rehearsal."
+        },
+        {
+          "display": "GRAIL (Ebb and Flow)",
+          "match": [
+            "grail",
+            "ebb",
+            "flow",
+            "gravity recovery",
+            "twin probes"
+          ],
+          "rarity": 51,
+          "note": "The twin spacecraft mapped the Moon's gravity field in 2012 before a planned impact on the surface."
+        },
+        {
+          "display": "Lunar Prospector",
+          "match": [
+            "lunar prospector",
+            "prospector",
+            "lunar prospecctor",
+            "moon prospector"
+          ],
+          "rarity": 65,
+          "note": "This 1998-99 polar orbiter found hydrogen enrichments at the lunar poles and was deliberately crashed into a south-pole crater."
+        },
+        {
+          "display": "LADEE",
+          "match": [
+            "ladee",
+            "lunar atmosphere",
+            "dust environment",
+            "ladee orbiter"
+          ],
+          "rarity": 77,
+          "note": "NASA's 2013-14 orbiter sampled the Moon's thin exosphere and dust before impacting the far side."
+        },
+        {
+          "display": "ARTEMIS P1 and P2",
+          "match": [
+            "artemis",
+            "themis",
+            "artemis p1",
+            "artemis p2",
+            "repurposed"
+          ],
+          "rarity": 87,
+          "note": "Two retired THEMIS satellites were moved into lunar orbit in 2011 to study the Moon's space environment."
+        },
+        {
+          "display": "CAPSTONE",
+          "match": [
+            "capstone",
+            "cubesat",
+            "near rectilinear",
+            "nrho"
+          ],
+          "rarity": 92,
+          "note": "A small cubesat that entered a near-rectilinear halo orbit in November 2022 to test the path Gateway will use."
+        },
+        {
+          "display": "Apollo 15 and 16 subsatellites",
+          "match": [
+            "subsatellite",
+            "sub satellite",
+            "particles and fields",
+            "apollo 15 subsatellite",
+            "apollo 16 subsatellite"
+          ],
+          "rarity": 97,
+          "note": "Apollo 15 and 16 each released a tiny satellite into lunar orbit to measure lunar gravity and magnetic fields."
+        }
+      ],
+      "reveal": "Cislunar space is the region every Apollo crew crossed on the way to the Moon, and a handful of small spacecraft still circle it today."
+    },
+    {
+      "id": "q02",
+      "zone": 4,
+      "topic": "Lunar surface",
+      "prompt": "Name something NASA left behind on the Moon.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Apollo 11 descent stage",
+          "match": [
+            "apollo 11",
+            "descent stage",
+            "tranquility base",
+            "eagle",
+            "lunar module"
+          ],
+          "rarity": 7,
+          "note": "Eagle's lower half stayed at Tranquility Base when the crew lifted off in July 1969."
+        },
+        {
+          "display": "Lunar Roving Vehicle",
+          "match": [
+            "rover",
+            "lunar rover",
+            "moon buggy",
+            "lrv",
+            "buggy"
+          ],
+          "rarity": 19,
+          "note": "Apollo 15, 16 and 17 each left a battery-powered rover parked near the landing site."
+        },
+        {
+          "display": "American flags",
+          "match": [
+            "flag",
+            "american flag",
+            "us flag",
+            "stars and stripes",
+            "flags"
+          ],
+          "rarity": 31,
+          "note": "Six Apollo crews planted US flags, and LRO imagery shows shadows from several of the flagpoles."
+        },
+        {
+          "display": "ALSEP experiment stations",
+          "match": [
+            "alsep",
+            "easep",
+            "geophysics station",
+            "experiment package",
+            "science station"
+          ],
+          "rarity": 45,
+          "note": "Apollo 12 and 14-17 deployed nuclear-powered geophysical stations that NASA switched off in 1977."
+        },
+        {
+          "display": "Laser retroreflector arrays",
+          "match": [
+            "retroreflector",
+            "reflector",
+            "laser mirror",
+            "laser ranging",
+            "mirror array"
+          ],
+          "rarity": 58,
+          "note": "Apollo 11, 14 and 15 left passive mirrors that astronomers still use to measure the Earth-Moon distance."
+        },
+        {
+          "display": "Surveyor 3 lander",
+          "match": [
+            "surveyor",
+            "surveyor 3",
+            "surveyor iii",
+            "surveyor lander"
+          ],
+          "rarity": 70,
+          "note": "Apollo 12 landed nearby in 1969 and its crew brought pieces of the 1967 robot lander home."
+        },
+        {
+          "display": "S-IVB rocket stages",
+          "match": [
+            "s-ivb",
+            "s ivb",
+            "saturn v",
+            "third stage",
+            "rocket stage"
+          ],
+          "rarity": 84,
+          "note": "Apollo 13 through 17 steered their spent Saturn V third stages into the Moon to calibrate seismometers."
+        },
+        {
+          "display": "Lunar module ascent stages",
+          "match": [
+            "ascent stage",
+            "lm ascent",
+            "jettisoned ascent",
+            "ascent"
+          ],
+          "rarity": 93,
+          "note": "Several Apollo ascent stages were cast off after the crews rejoined the command module and later struck the Moon."
+        }
+      ],
+      "reveal": "With no atmosphere, wind or liquid water, nothing on the Moon rusts or blows away - only micrometeorites slowly erode it over millions of years."
+    },
+    {
+      "id": "q03",
+      "zone": 4,
+      "topic": "Lunar surface",
+      "prompt": "Name an instrument NASA left working on the Moon.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Laser retroreflector",
+          "match": [
+            "retroreflector",
+            "reflector",
+            "laser mirror",
+            "laser ranging",
+            "mirror"
+          ],
+          "rarity": 13,
+          "note": "Three Apollo arrays still return laser pulses fired from Earth, needing no electricity of their own."
+        },
+        {
+          "display": "Seismometer",
+          "match": [
+            "seismometer",
+            "seismic",
+            "moonquake",
+            "quake",
+            "seismograph"
+          ],
+          "rarity": 25,
+          "note": "ALSEP seismometers recorded moonquakes and meteorite impacts for years and revealed the Moon's internal structure."
+        },
+        {
+          "display": "SNAP-27 radioisotope generator",
+          "match": [
+            "snap 27",
+            "snap-27",
+            "rtg",
+            "radioisotope",
+            "plutonium",
+            "generator"
+          ],
+          "rarity": 42,
+          "note": "These plutonium-238 power units ran the Apollo 12 and 14-17 experiment stations long after the crews left."
+        },
+        {
+          "display": "Surface magnetometer",
+          "match": [
+            "magnetometer",
+            "magnetic field",
+            "magnetometer experiment",
+            "magnet"
+          ],
+          "rarity": 55,
+          "note": "Several Apollo ALSEP stations carried magnetometers that measured the Moon's weak crustal magnetic field."
+        },
+        {
+          "display": "Heat flow probe",
+          "match": [
+            "heat flow",
+            "heatflow",
+            "thermal probe",
+            "thermometer",
+            "temperature probe"
+          ],
+          "rarity": 66,
+          "note": "Apollo 15 and 17 placed thermometers in drilled holes to measure heat escaping from the lunar interior."
+        },
+        {
+          "display": "Cold cathode ion gauge",
+          "match": [
+            "ion gauge",
+            "cold cathode",
+            "atmosphere gauge",
+            "ccge",
+            "lunar atmosphere"
+          ],
+          "rarity": 78,
+          "note": "Apollo 12, 14 and 15 used this gauge to measure the Moon's extremely thin atmosphere."
+        },
+        {
+          "display": "Lunar Surface Gravimeter",
+          "match": [
+            "gravimeter",
+            "surface gravimeter",
+            "gravity meter",
+            "lsg"
+          ],
+          "rarity": 88,
+          "note": "Apollo 17's gravimeter was built to detect gravitational waves but was miscalibrated and returned no useful data."
+        },
+        {
+          "display": "Lunar Ejecta and Meteorites experiment",
+          "match": [
+            "leam",
+            "ejecta",
+            "meteorites",
+            "micrometeorite",
+            "lunar ejecta"
+          ],
+          "rarity": 96,
+          "note": "Apollo 17's LEAM counted tiny meteorite impacts but overheated in the lunar daytime."
+        }
+      ],
+      "reveal": "The nuclear-powered ALSEP network ran until NASA shut it down on 30 September 1977, while the passive reflectors need no power at all."
+    },
+    {
+      "id": "q04",
+      "zone": 5,
+      "topic": "Solar orbit",
+      "prompt": "Name a NASA spacecraft left in orbit around the Sun after its mission ended.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Kepler space telescope",
+          "match": [
+            "kepler",
+            "kepler telescope",
+            "planet hunter",
+            "exoplanet telescope"
+          ],
+          "rarity": 9,
+          "note": "Retired in October 2018 in a safe Earth-trailing solar orbit after confirming more than 2,600 exoplanets."
+        },
+        {
+          "display": "Mariner 10",
+          "match": [
+            "mariner 10",
+            "mariner x",
+            "mariner",
+            "mercury probe"
+          ],
+          "rarity": 34,
+          "note": "After three Mercury flybys in 1974-75 it was switched off and left circling the Sun."
+        },
+        {
+          "display": "Deep Space 1",
+          "match": [
+            "deep space 1",
+            "ds1",
+            "ion engine",
+            "borrelly"
+          ],
+          "rarity": 49,
+          "note": "This ion-propulsion technology demonstrator was retired in 2001 in solar orbit after imaging comet Borrelly."
+        },
+        {
+          "display": "Pioneer 4",
+          "match": [
+            "pioneer 4",
+            "pioneer iv",
+            "pioneer four",
+            "1959 probe"
+          ],
+          "rarity": 62,
+          "note": "In March 1959 it became the first US spacecraft to escape Earth's gravity, entering orbit around the Sun."
+        },
+        {
+          "display": "Ulysses",
+          "match": [
+            "ulysses",
+            "ulysses probe",
+            "solar polar",
+            "1992 jupiter"
+          ],
+          "rarity": 68,
+          "note": "This ESA-NASA probe used a Jupiter gravity assist in 1992 to orbit over the Sun's poles until 2009."
+        },
+        {
+          "display": "STEREO-B",
+          "match": [
+            "stereo b",
+            "stereo-b",
+            "stereob",
+            "behind spacecraft"
+          ],
+          "rarity": 74,
+          "note": "The solar observatory lost contact in 2014 and NASA ended recovery efforts in 2018, leaving it in heliocentric orbit."
+        },
+        {
+          "display": "ISEE-3 / ICE",
+          "match": [
+            "isee 3",
+            "isee-3",
+            "ice probe",
+            "international cometary",
+            "giacobini"
+          ],
+          "rarity": 86,
+          "note": "Repurposed to fly through comet Giacobini-Zinner's tail in 1985, it was later left in solar orbit with contact lost."
+        },
+        {
+          "display": "Helios 2",
+          "match": [
+            "helios 2",
+            "helios ii",
+            "helios b",
+            "helios"
+          ],
+          "rarity": 94,
+          "note": "The 1976 NASA-German solar probe held the closest solar approach and fastest-spacecraft records until Parker Solar Probe."
+        }
+      ],
+      "reveal": "A heliocentric orbit has no drag to brake it, so a retired spacecraft like Kepler will keep circling the Sun indefinitely."
+    },
+    {
+      "id": "q05",
+      "zone": 7,
+      "topic": "Mars surface",
+      "prompt": "Name a NASA rover or lander that sits on the surface of Mars.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Opportunity",
+          "match": [
+            "opportunity",
+            "mer b",
+            "mer-b",
+            "oppie"
+          ],
+          "rarity": 7,
+          "note": "It drove more than 45 km from 2004 until the 2018 global dust storm ended the mission."
+        },
+        {
+          "display": "Spirit",
+          "match": [
+            "spirit",
+            "mer a",
+            "mer-a",
+            "gusev"
+          ],
+          "rarity": 17,
+          "note": "Opportunity's twin worked in Gusev Crater for six years from 2004."
+        },
+        {
+          "display": "Curiosity",
+          "match": [
+            "curiosity",
+            "msl",
+            "gale crater",
+            "mount sharp"
+          ],
+          "rarity": 26,
+          "note": "The nuclear-powered rover has climbed Mount Sharp in Gale Crater since landing in 2012."
+        },
+        {
+          "display": "Perseverance",
+          "match": [
+            "perseverance",
+            "mars 2020",
+            "percy",
+            "jezero"
+          ],
+          "rarity": 35,
+          "note": "It has been caching sealed rock samples in Jezero Crater since 2021."
+        },
+        {
+          "display": "Sojourner",
+          "match": [
+            "sojourner",
+            "pathfinder",
+            "mars pathfinder",
+            "microrover"
+          ],
+          "rarity": 48,
+          "note": "The 1997 Pathfinder microrover was the first wheeled vehicle to drive on another planet."
+        },
+        {
+          "display": "InSight",
+          "match": [
+            "insight",
+            "insight lander",
+            "seismic lander",
+            "marsquake"
+          ],
+          "rarity": 59,
+          "note": "This stationary lander recorded marsquakes from 2018 until accumulated dust ended it in 2022."
+        },
+        {
+          "display": "Phoenix",
+          "match": [
+            "phoenix",
+            "phoenix lander",
+            "polar lander",
+            "ice digger"
+          ],
+          "rarity": 71,
+          "note": "It dug into and confirmed water ice in the arctic plains in 2008."
+        },
+        {
+          "display": "Viking 1 lander",
+          "match": [
+            "viking 1",
+            "viking i",
+            "viking lander",
+            "viking 1 lander"
+          ],
+          "rarity": 85,
+          "note": "The first successful US Mars landing, in 1976, operated for more than six years."
+        },
+        {
+          "display": "Viking 2 lander",
+          "match": [
+            "viking 2",
+            "viking ii",
+            "utopia lander",
+            "viking 2 lander"
+          ],
+          "rarity": 93,
+          "note": "It touched down at Utopia Planitia in 1976 and returned data until 1980."
+        }
+      ],
+      "reveal": "Mars has no rain to rinse solar panels, so dust accumulation is what eventually silenced both InSight and Opportunity."
+    },
+    {
+      "id": "q06",
+      "zone": 7,
+      "topic": "Mars surface",
+      "prompt": "Name a place on Mars where NASA has landed a spacecraft.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Gale Crater",
+          "match": [
+            "gale crater",
+            "gale",
+            "mount sharp",
+            "gale impact"
+          ],
+          "rarity": 12,
+          "note": "Curiosity landed here in 2012 to study layered rocks recording an ancient lake."
+        },
+        {
+          "display": "Jezero Crater",
+          "match": [
+            "jezero",
+            "jezero crater",
+            "delta",
+            "ancient delta"
+          ],
+          "rarity": 22,
+          "note": "Perseverance landed in 2021 at an ancient river delta to look for signs of past microbial life."
+        },
+        {
+          "display": "Meridiani Planum",
+          "match": [
+            "meridiani",
+            "meridiani planum",
+            "hematite",
+            "blueberries"
+          ],
+          "rarity": 38,
+          "note": "Opportunity found hematite blueberries here in 2004, mineral spheres that form in water."
+        },
+        {
+          "display": "Gusev Crater",
+          "match": [
+            "gusev",
+            "gusev crater",
+            "spirit site",
+            "gusev impact"
+          ],
+          "rarity": 52,
+          "note": "Spirit explored this crater's floor and hills from 2004 until 2010."
+        },
+        {
+          "display": "Ares Vallis",
+          "match": [
+            "ares vallis",
+            "ares",
+            "pathfinder site",
+            "vallis"
+          ],
+          "rarity": 64,
+          "note": "Mars Pathfinder and Sojourner set down in this ancient flood plain in 1997."
+        },
+        {
+          "display": "Chryse Planitia",
+          "match": [
+            "chryse",
+            "chryse planitia",
+            "viking 1 site",
+            "plains of gold"
+          ],
+          "rarity": 76,
+          "note": "Viking 1 touched down on the western slope of Chryse Planitia in 1976."
+        },
+        {
+          "display": "Utopia Planitia",
+          "match": [
+            "utopia",
+            "utopia planitia",
+            "viking 2 site",
+            "utopia plains"
+          ],
+          "rarity": 83,
+          "note": "Viking 2 landed on this northern plain in 1976."
+        },
+        {
+          "display": "Elysium Planitia",
+          "match": [
+            "elysium",
+            "elysium planitia",
+            "insight site",
+            "elysium plains"
+          ],
+          "rarity": 90,
+          "note": "InSight chose this flat, near-equatorial plain in 2018 so its seismometer could sit on stable ground."
+        },
+        {
+          "display": "Vastitas Borealis",
+          "match": [
+            "vastitas",
+            "vastitas borealis",
+            "green valley",
+            "arctic plains"
+          ],
+          "rarity": 96,
+          "note": "Phoenix landed in this northern arctic plain in 2008 and scraped exposed water ice."
+        }
+      ],
+      "reveal": "Landing sites are picked for science and safety - Jezero for its ancient river delta, Elysium Planitia for flat ground to place a seismometer."
+    },
+    {
+      "id": "q07",
+      "zone": 9,
+      "topic": "Jovian system",
+      "prompt": "Name a NASA spacecraft that has visited Jupiter.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Voyager 1",
+          "match": [
+            "voyager 1",
+            "voyager i",
+            "voyager one",
+            "1979 flyby"
+          ],
+          "rarity": 8,
+          "note": "Its 1979 flyby revealed active volcanoes on Io and a faint ring around Jupiter."
+        },
+        {
+          "display": "Voyager 2",
+          "match": [
+            "voyager 2",
+            "voyager ii",
+            "voyager two",
+            "1979 jupiter"
+          ],
+          "rarity": 16,
+          "note": "It passed Jupiter in 1979 on the way to Saturn, Uranus and Neptune."
+        },
+        {
+          "display": "Juno",
+          "match": [
+            "juno",
+            "juno spacecraft",
+            "polar orbit",
+            "juno probe"
+          ],
+          "rarity": 27,
+          "note": "Juno entered a polar orbit in 2016 to map Jupiter's gravity and magnetic field beneath the clouds."
+        },
+        {
+          "display": "Galileo",
+          "match": [
+            "galileo",
+            "galileo orbiter",
+            "jupiter orbiter",
+            "atmospheric probe"
+          ],
+          "rarity": 39,
+          "note": "It orbited Jupiter from 1995 to 2003 and dropped a probe into the atmosphere."
+        },
+        {
+          "display": "Pioneer 10",
+          "match": [
+            "pioneer 10",
+            "pioneer x",
+            "pioneer ten",
+            "first jupiter"
+          ],
+          "rarity": 47,
+          "note": "In 1973 it became the first spacecraft to cross the asteroid belt and fly past Jupiter."
+        },
+        {
+          "display": "Pioneer 11",
+          "match": [
+            "pioneer 11",
+            "pioneer xi",
+            "pioneer eleven",
+            "jupiter gravity assist"
+          ],
+          "rarity": 60,
+          "note": "Its 1974 Jupiter swingby used the planet's gravity to aim it toward Saturn."
+        },
+        {
+          "display": "New Horizons",
+          "match": [
+            "new horizons",
+            "pluto probe",
+            "gravity assist",
+            "2007 jupiter"
+          ],
+          "rarity": 73,
+          "note": "It used a Jupiter gravity assist in 2007 to speed up on its way to Pluto."
+        },
+        {
+          "display": "Europa Clipper",
+          "match": [
+            "europa clipper",
+            "clipper",
+            "europa mission",
+            "jupiter europa"
+          ],
+          "rarity": 88,
+          "note": "Launched in October 2024, it is cruising toward Jupiter to survey Europa's ice shell and ocean."
+        },
+        {
+          "display": "Ulysses",
+          "match": [
+            "ulysses",
+            "ulysses probe",
+            "solar polar",
+            "1992 jupiter"
+          ],
+          "rarity": 95,
+          "note": "The ESA-NASA probe used a Jupiter flyby in 1992 to tip into an orbit over the Sun's poles."
+        }
+      ],
+      "reveal": "Galileo was deliberately flown into Jupiter's atmosphere in 2003 so it could never crash into and contaminate Europa's possible ocean."
+    },
+    {
+      "id": "q08",
+      "zone": 10,
+      "topic": "Saturnian system",
+      "prompt": "Name a moon of Saturn that NASA's Cassini mission studied up close.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Titan",
+          "match": [
+            "titan",
+            "titan moon",
+            "methane seas",
+            "huygens"
+          ],
+          "rarity": 9,
+          "note": "Cassini mapped methane seas and rivers, and delivered ESA's Huygens probe to the surface in 2005."
+        },
+        {
+          "display": "Enceladus",
+          "match": [
+            "enceladus",
+            "enceladus plumes",
+            "plumes",
+            "geysers"
+          ],
+          "rarity": 20,
+          "note": "Cassini discovered water-ice plumes erupting from a global subsurface ocean."
+        },
+        {
+          "display": "Mimas",
+          "match": [
+            "mimas",
+            "herschel crater",
+            "death star",
+            "mimas moon"
+          ],
+          "rarity": 40,
+          "note": "Its enormous Herschel impact crater gives this small moon a famously recognisable silhouette."
+        },
+        {
+          "display": "Iapetus",
+          "match": [
+            "iapetus",
+            "equatorial ridge",
+            "two toned",
+            "iapetus moon"
+          ],
+          "rarity": 54,
+          "note": "Cassini imaged its stark two-toned surface and a mountain ridge running along the equator."
+        },
+        {
+          "display": "Dione",
+          "match": [
+            "dione",
+            "wispy terrain",
+            "dione moon",
+            "ice cliffs"
+          ],
+          "rarity": 65,
+          "note": "Its wispy terrain turned out to be bright ice cliffs created by tectonic fractures."
+        },
+        {
+          "display": "Rhea",
+          "match": [
+            "rhea",
+            "rhea moon",
+            "second largest",
+            "rhea rings"
+          ],
+          "rarity": 72,
+          "note": "Cassini searched around Saturn's second-largest moon for a faint ring system but found none."
+        },
+        {
+          "display": "Tethys",
+          "match": [
+            "tethys",
+            "odysseus crater",
+            "tethys moon",
+            "ithaca chasma"
+          ],
+          "rarity": 81,
+          "note": "The giant Odysseus impact basin and the Ithaca Chasma canyon dominate its surface."
+        },
+        {
+          "display": "Hyperion",
+          "match": [
+            "hyperion",
+            "chaotic rotation",
+            "sponge moon",
+            "hyperion moon"
+          ],
+          "rarity": 90,
+          "note": "Cassini imaged this irregular, sponge-textured moon, which tumbles unpredictably as it orbits."
+        },
+        {
+          "display": "Phoebe",
+          "match": [
+            "phoebe",
+            "phoebe moon",
+            "irregular moon",
+            "captured moon"
+          ],
+          "rarity": 97,
+          "note": "Cassini photographed this distant irregular moon on arrival in 2004; it is likely a captured outer-solar-system body."
+        }
+      ],
+      "reveal": "Cassini was flown into Saturn's atmosphere on 15 September 2017 so it could never collide with Enceladus or Titan and contaminate them."
+    },
+    {
+      "id": "q09",
+      "zone": 12,
+      "topic": "Heliopause",
+      "prompt": "Name a piece of NASA hardware that has crossed the heliopause.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Voyager 1",
+          "match": [
+            "voyager 1",
+            "voyager i",
+            "voyager one",
+            "interstellar probe"
+          ],
+          "rarity": 8,
+          "note": "It crossed the heliopause on 25 August 2012, the first human-made object to reach interstellar space."
+        },
+        {
+          "display": "Voyager 2",
+          "match": [
+            "voyager 2",
+            "voyager ii",
+            "voyager two",
+            "2018 crossing"
+          ],
+          "rarity": 18,
+          "note": "It crossed on 5 November 2018 and remains the only spacecraft to have visited Uranus and Neptune."
+        },
+        {
+          "display": "Voyager Golden Record",
+          "match": [
+            "golden record",
+            "gold record",
+            "phonograph record",
+            "golden disc"
+          ],
+          "rarity": 28,
+          "note": "Each Voyager carries an identical gold-plated record of Earth's sounds, greetings and images."
+        },
+        {
+          "display": "Plasma Wave Science instrument",
+          "match": [
+            "plasma wave",
+            "pws",
+            "plasma density",
+            "plasma instrument"
+          ],
+          "rarity": 43,
+          "note": "Voyager 1's PWS measured the sharp rise in plasma density that confirmed it had left the heliosphere."
+        },
+        {
+          "display": "Cosmic Ray Subsystem",
+          "match": [
+            "cosmic ray",
+            "crs",
+            "galactic cosmic rays",
+            "cosmic ray subsystem"
+          ],
+          "rarity": 56,
+          "note": "It recorded solar particles dropping away while galactic cosmic rays surged at the boundary."
+        },
+        {
+          "display": "High-gain antenna",
+          "match": [
+            "high gain antenna",
+            "dish",
+            "3.7 metre",
+            "radio dish"
+          ],
+          "rarity": 67,
+          "note": "The 3.7-metre dish still sends data home across a one-way light-time of more than 22 hours."
+        },
+        {
+          "display": "Radioisotope thermoelectric generators",
+          "match": [
+            "rtg",
+            "radioisotope",
+            "plutonium",
+            "power generator",
+            "rtgs"
+          ],
+          "rarity": 77,
+          "note": "Three plutonium-238 generators per probe are slowly decaying, forcing NASA to switch instruments off."
+        },
+        {
+          "display": "Low-Energy Charged Particle instrument",
+          "match": [
+            "lecp",
+            "charged particle",
+            "low energy",
+            "particle instrument"
+          ],
+          "rarity": 87,
+          "note": "It tracked how particles from the Sun fade away as the probes enter interstellar space."
+        },
+        {
+          "display": "Magnetometer",
+          "match": [
+            "magnetometer",
+            "magnetic field",
+            "mag instrument",
+            "field instrument"
+          ],
+          "rarity": 95,
+          "note": "Voyager's magnetometers measured the magnetic field of the interstellar medium beyond the heliopause."
+        }
+      ],
+      "reveal": "The heliopause is where the outward solar wind finally gives way to the pressure of interstellar gas, and both Voyagers still transmit from beyond it."
+    },
+    {
+      "id": "q10",
+      "zone": 13,
+      "topic": "Interstellar space",
+      "prompt": "Name a NASA spacecraft that will never return to Earth.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Voyager 1",
+          "match": [
+            "voyager 1",
+            "voyager i",
+            "voyager one",
+            "most distant"
+          ],
+          "rarity": 6,
+          "note": "The most distant human-made object, it is moving away from the Sun at roughly 17 km every second."
+        },
+        {
+          "display": "Voyager 2",
+          "match": [
+            "voyager 2",
+            "voyager ii",
+            "voyager two",
+            "outer planets"
+          ],
+          "rarity": 14,
+          "note": "The only spacecraft to fly past all four giant planets, it continues outward into interstellar space."
+        },
+        {
+          "display": "New Horizons",
+          "match": [
+            "new horizons",
+            "pluto",
+            "kuiper belt",
+            "pluto probe"
+          ],
+          "rarity": 24,
+          "note": "After its 2015 Pluto flyby it kept going into the Kuiper Belt with no way to turn back."
+        },
+        {
+          "display": "Pioneer 10",
+          "match": [
+            "pioneer 10",
+            "pioneer x",
+            "pioneer ten",
+            "first asteroid belt"
+          ],
+          "rarity": 36,
+          "note": "The first probe to traverse the asteroid belt and visit Jupiter sent its last signal in 2003."
+        },
+        {
+          "display": "Pioneer 11",
+          "match": [
+            "pioneer 11",
+            "pioneer xi",
+            "pioneer eleven",
+            "first saturn"
+          ],
+          "rarity": 49,
+          "note": "The first spacecraft to reach Saturn fell silent in 1995 while heading out of the solar system."
+        },
+        {
+          "display": "Galileo",
+          "match": [
+            "galileo",
+            "jupiter orbiter",
+            "2003 plunge",
+            "galileo probe"
+          ],
+          "rarity": 61,
+          "note": "It was deliberately steered into Jupiter's atmosphere in 2003 to protect Europa from contamination."
+        },
+        {
+          "display": "Cassini",
+          "match": [
+            "cassini",
+            "grand finale",
+            "saturn orbiter",
+            "cassini probe"
+          ],
+          "rarity": 70,
+          "note": "Its 2017 Grand Finale ended with a deliberate plunge into Saturn's atmosphere."
+        },
+        {
+          "display": "Pioneer 4",
+          "match": [
+            "pioneer 4",
+            "pioneer iv",
+            "1959 probe",
+            "first escape"
+          ],
+          "rarity": 84,
+          "note": "In 1959 it became the first US spacecraft to escape Earth's gravity and its batteries died soon after."
+        },
+        {
+          "display": "Pioneer plaque",
+          "match": [
+            "pioneer plaque",
+            "plaque",
+            "gold plaque",
+            "pulsar map"
+          ],
+          "rarity": 91,
+          "note": "Pioneers 10 and 11 each carry a gold-anodised aluminium plaque depicting humans and a pulsar map."
+        },
+        {
+          "display": "Mariner 10",
+          "match": [
+            "mariner 10",
+            "mariner x",
+            "mercury probe",
+            "three flybys"
+          ],
+          "rarity": 97,
+          "note": "Switched off in 1975 after three Mercury flybys, it was left circling the Sun."
+        }
+      ],
+      "reveal": "Beyond the heliopause there is nothing to slow these probes down, so they will keep drifting through the galaxy for billions of years."
+    },
+    {
+      "id": "q11",
+      "zone": 1,
+      "topic": "Low Earth Orbit",
+      "prompt": "Name a NASA satellite left in Earth orbit when its mission ended.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Vanguard 1",
+          "match": [
+            "vanguard 1",
+            "vanguard i",
+            "vanguard one",
+            "vanguard",
+            "oldest satellite"
+          ],
+          "rarity": 9,
+          "note": "Launched on 17 March 1958, its solar-powered transmitter died in 1964 but it remains the oldest human-made object in orbit."
+        },
+        {
+          "display": "Landsat 5",
+          "match": [
+            "landsat 5",
+            "landsat",
+            "landsat v",
+            "thematic mapper",
+            "earth imaging satellite"
+          ],
+          "rarity": 18,
+          "note": "It photographed Earth for nearly three decades before NASA switched it off in 2013, and the satellite is still up there."
+        },
+        {
+          "display": "LAGEOS-1",
+          "match": [
+            "lageos 1",
+            "lageos-1",
+            "lageos i",
+            "laser geodynamics",
+            "retroreflector sphere"
+          ],
+          "rarity": 30,
+          "note": "This 1976 sphere carries no electronics at all - just retroreflectors that ground lasers still bounce off to measure continental drift."
+        },
+        {
+          "display": "COBE",
+          "match": [
+            "cobe",
+            "cosmic background explorer",
+            "background explorer",
+            "big bang satellite"
+          ],
+          "rarity": 42,
+          "note": "The Cosmic Background Explorer mapped the afterglow of the Big Bang from 1989 to 1993 and was then switched off in orbit."
+        },
+        {
+          "display": "TDRS-1",
+          "match": [
+            "tdrs 1",
+            "tdrs-1",
+            "tracking and data relay",
+            "relay satellite",
+            "tdrs"
+          ],
+          "rarity": 55,
+          "note": "NASA's first Tracking and Data Relay Satellite was retired in 2009 after more than 25 years and moved clear of the working fleet."
+        },
+        {
+          "display": "Pegasus micrometeoroid satellites",
+          "match": [
+            "pegasus",
+            "micrometeoroid",
+            "saturn i panels",
+            "micrometeorite detector",
+            "pegasus 1"
+          ],
+          "rarity": 68,
+          "note": "Three 1965 Saturn I launches unfolded huge wings to count micrometeoroid punctures, then were left in orbit when their batteries died."
+        },
+        {
+          "display": "LAGEOS-2",
+          "match": [
+            "lageos 2",
+            "lageos-2",
+            "lageos ii",
+            "italian lageos",
+            "asi satellite"
+          ],
+          "rarity": 76,
+          "note": "A near-twin of LAGEOS-1, launched in 1992 with the Italian space agency and still laser-ranged from Earth today."
+        },
+        {
+          "display": "PAGEOS balloon",
+          "match": [
+            "pageos",
+            "geodetic balloon",
+            "passive balloon",
+            "reflective sphere",
+            "triangulation balloon"
+          ],
+          "rarity": 88,
+          "note": "NASA's 1966 passive geodetic balloon was a giant reflective sphere used to triangulate the globe before it broke apart."
+        },
+        {
+          "display": "Relay 2",
+          "match": [
+            "relay 2",
+            "relay ii",
+            "relay satellite",
+            "early communications",
+            "relay two"
+          ],
+          "rarity": 96,
+          "note": "One of NASA's first communications satellites, launched in 1964 and switched off a few years later but still circling Earth."
+        }
+      ],
+      "reveal": "With almost no air at orbital altitude there is nothing to brake them - some of NASA's earliest satellites are still circling Earth decades after they fell silent."
+    },
+    {
+      "id": "q12",
+      "zone": 2,
+      "topic": "Van Allen Belts",
+      "prompt": "Name a NASA mission that studied Earth's radiation belts.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Explorer 1",
+          "match": [
+            "explorer 1",
+            "explorer i",
+            "first us satellite",
+            "van allen counter",
+            "geiger counter"
+          ],
+          "rarity": 8,
+          "note": "The first US satellite, launched in 1958, carried James Van Allen's radiation detector - and discovered the belts by accident."
+        },
+        {
+          "display": "Van Allen Probes",
+          "match": [
+            "van allen probes",
+            "van allen",
+            "rbsp",
+            "radiation belt storm",
+            "twin probes"
+          ],
+          "rarity": 19,
+          "note": "Twin spacecraft launched in 2012 mapped the belts in detail until 2019 and even found a temporary third belt."
+        },
+        {
+          "display": "Pioneer 3",
+          "match": [
+            "pioneer 3",
+            "pioneer iii",
+            "pioneer three",
+            "1958 lunar probe",
+            "outer belt"
+          ],
+          "rarity": 30,
+          "note": "This 1958 probe missed the Moon, but on the way back out its counters revealed a second, outer radiation belt."
+        },
+        {
+          "display": "Explorer 3",
+          "match": [
+            "explorer 3",
+            "explorer iii",
+            "explorer three",
+            "tape recorder",
+            "1958 satellite"
+          ],
+          "rarity": 40,
+          "note": "Launched weeks after Explorer 1, its tape recorder stored enough data to confirm the belts were real and persistent."
+        },
+        {
+          "display": "SAMPEX",
+          "match": [
+            "sampex",
+            "solar anomalous",
+            "magnetospheric particle",
+            "particle explorer"
+          ],
+          "rarity": 52,
+          "note": "The Solar, Anomalous and Magnetospheric Particle Explorer sampled energetic particles in the belts from 1992 until 2012."
+        },
+        {
+          "display": "Explorer 4",
+          "match": [
+            "explorer 4",
+            "explorer iv",
+            "explorer four",
+            "1958 belt mapper",
+            "particle detectors"
+          ],
+          "rarity": 62,
+          "note": "Purpose-built in 1958 to map the newly discovered belts with a suite of particle detectors."
+        },
+        {
+          "display": "CRRES",
+          "match": [
+            "crres",
+            "combined release",
+            "radiation effects satellite",
+            "chemical release"
+          ],
+          "rarity": 73,
+          "note": "The 1990 Combined Release and Radiation Effects Satellite measured the belts and released chemicals to trace electric fields."
+        },
+        {
+          "display": "BARREL",
+          "match": [
+            "barrel",
+            "balloon campaign",
+            "antarctic balloons",
+            "electron precipitation",
+            "balloon array"
+          ],
+          "rarity": 85,
+          "note": "NASA's 2013-14 Antarctic balloon campaign measured electrons raining out of the belts while the Van Allen Probes watched from above."
+        },
+        {
+          "display": "THEMIS",
+          "match": [
+            "themis",
+            "five probes",
+            "substorm",
+            "time history",
+            "artemis predecessor"
+          ],
+          "rarity": 95,
+          "note": "Five 2007 probes timed the substorms that inject particles into the belts; two were later moved into lunar orbit as ARTEMIS."
+        }
+      ],
+      "reveal": "Explorer 1's detector kept saturating over the equator - NASA's very first satellite had stumbled on the radiation environment every crewed mission must cross."
+    },
+    {
+      "id": "q13",
+      "zone": 0,
+      "topic": "Surface",
+      "prompt": "Name a piece of NASA launch hardware discarded on the way to orbit.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Payload fairing",
+          "match": [
+            "fairing",
+            "payload fairing",
+            "nose cone",
+            "nose shroud",
+            "clamshell"
+          ],
+          "rarity": 7,
+          "note": "The protective nose cone splits into halves and falls away once the rocket is above the thick part of the atmosphere."
+        },
+        {
+          "display": "Solid rocket boosters",
+          "match": [
+            "solid rocket booster",
+            "srb",
+            "boosters",
+            "solid booster",
+            "strap on booster"
+          ],
+          "rarity": 16,
+          "note": "The shuttle's two boosters were cast off after about two minutes, parachuted into the ocean and refurbished to fly again."
+        },
+        {
+          "display": "External tank",
+          "match": [
+            "external tank",
+            "orange tank",
+            "shuttle tank",
+            "et tank",
+            "fuel tank"
+          ],
+          "rarity": 25,
+          "note": "The shuttle's giant tank was the only major element not reused - it was jettisoned and broke up over the ocean."
+        },
+        {
+          "display": "Launch escape tower",
+          "match": [
+            "escape tower",
+            "launch escape",
+            "les",
+            "abort tower",
+            "escape rocket"
+          ],
+          "rarity": 35,
+          "note": "The Apollo and Mercury escape rocket sat on top of the capsule and was jettisoned once the crew had other abort options."
+        },
+        {
+          "display": "S-IC first stage",
+          "match": [
+            "s-ic",
+            "s ic",
+            "first stage",
+            "saturn v first stage",
+            "five engines"
+          ],
+          "rarity": 46,
+          "note": "The Saturn V's five-engine first stage burned for about two and a half minutes, then dropped away into the Atlantic."
+        },
+        {
+          "display": "S-II second stage",
+          "match": [
+            "s-ii",
+            "s ii",
+            "second stage",
+            "saturn v second stage",
+            "hydrogen stage"
+          ],
+          "rarity": 58,
+          "note": "Saturn V's liquid-hydrogen second stage was discarded near the edge of the atmosphere after pushing the stack almost to orbit."
+        },
+        {
+          "display": "Centaur upper stage",
+          "match": [
+            "centaur",
+            "centaur upper",
+            "hydrogen upper stage",
+            "atlas centaur"
+          ],
+          "rarity": 70,
+          "note": "After delivering its payload, this long-lived upper stage is often left in a graveyard or heliocentric orbit."
+        },
+        {
+          "display": "Interstage",
+          "match": [
+            "interstage",
+            "stage adapter",
+            "structural ring",
+            "separation ring",
+            "adapter ring"
+          ],
+          "rarity": 82,
+          "note": "The structural ring joining Saturn stages was jettisoned once the lower stage had finished burning and separated."
+        },
+        {
+          "display": "Ullage motors",
+          "match": [
+            "ullage",
+            "ullage motor",
+            "ullage rockets",
+            "settling rockets",
+            "propellant settling"
+          ],
+          "rarity": 93,
+          "note": "Small solid rockets briefly fired to settle liquid propellant before an upper-stage restart, then were thrown away with the interstage."
+        }
+      ],
+      "reveal": "The first thing any mission abandons is the rocket that lifted it - most of a launch vehicle's mass never reaches space at all."
+    },
+    {
+      "id": "q14",
+      "zone": 6,
+      "topic": "Martian Transfer",
+      "prompt": "Name a piece of hardware NASA discarded on the way to landing on Mars.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Cruise stage",
+          "match": [
+            "cruise stage",
+            "cruise",
+            "cruise platform",
+            "interstage platform",
+            "solar cruise"
+          ],
+          "rarity": 8,
+          "note": "The flat, solar-powered platform that flew the spacecraft from Earth was cut loose minutes before atmospheric entry."
+        },
+        {
+          "display": "Heat shield",
+          "match": [
+            "heat shield",
+            "aeroshell shield",
+            "thermal protection",
+            "ablative shield",
+            "forebody"
+          ],
+          "rarity": 17,
+          "note": "The aeroshell's forward shield absorbed the heat of entry, then was dropped so the lander's radar and legs could see out."
+        },
+        {
+          "display": "Supersonic parachute",
+          "match": [
+            "parachute",
+            "supersonic parachute",
+            "chute",
+            "drogue",
+            "decelerator"
+          ],
+          "rarity": 28,
+          "note": "A disk-gap-band canopy slowed the capsule for a few minutes at supersonic speed before the backshell released it."
+        },
+        {
+          "display": "Backshell",
+          "match": [
+            "backshell",
+            "back shell",
+            "conical backshell",
+            "aeroshell back",
+            "parachute cone"
+          ],
+          "rarity": 38,
+          "note": "The cone-shaped rear half of the aeroshell carried the parachute and was jettisoned along with it."
+        },
+        {
+          "display": "Sky crane descent stage",
+          "match": [
+            "sky crane",
+            "skycrane",
+            "descent stage",
+            "rocket powered stage",
+            "cable descent"
+          ],
+          "rarity": 49,
+          "note": "Curiosity and Perseverance were lowered on cables from a hovering rocket stage that then flew away and crashed at a safe distance."
+        },
+        {
+          "display": "Entry balance mass devices",
+          "match": [
+            "balance mass",
+            "balance masses",
+            "tungsten blocks",
+            "entry mass",
+            "center of mass"
+          ],
+          "rarity": 62,
+          "note": "Heavy tungsten blocks were released during entry to shift the capsule's centre of mass so it could steer itself through the atmosphere."
+        },
+        {
+          "display": "Viking bioshield",
+          "match": [
+            "bioshield",
+            "bio shield",
+            "sterile cap",
+            "biological shield",
+            "viking cap"
+          ],
+          "rarity": 74,
+          "note": "Viking's lander was sealed inside a sterile shell to protect Mars from Earth microbes, cast off once beyond the biosphere."
+        },
+        {
+          "display": "Mars Pathfinder airbags",
+          "match": [
+            "airbags",
+            "air bags",
+            "pathfinder airbags",
+            "bounce landing",
+            "inflatable bags"
+          ],
+          "rarity": 85,
+          "note": "Pathfinder bounced to a stop inside a cocoon of giant airbags that were then deflated and pulled out of the way."
+        },
+        {
+          "display": "Deep Space 2 microprobes",
+          "match": [
+            "deep space 2",
+            "ds2",
+            "microprobes",
+            "penetrators",
+            "new millennium probes"
+          ],
+          "rarity": 95,
+          "note": "Two pencil-sized penetrators were released from Mars Polar Lander's cruise stage in 1999 to strike the surface; no signal was ever received."
+        }
+      ],
+      "reveal": "Almost every Mars landing throws away more hardware than it keeps - the cruise stage, aeroshell, parachute and descent gear are all gone within ten minutes."
+    },
+    {
+      "id": "q15",
+      "zone": 8,
+      "topic": "Asteroid Belt",
+      "prompt": "Name a NASA spacecraft that has visited an asteroid.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Dawn",
+          "match": [
+            "dawn",
+            "dawn spacecraft",
+            "vesta",
+            "ceres",
+            "ion propulsion mission"
+          ],
+          "rarity": 8,
+          "note": "It orbited Vesta in 2011 and Ceres in 2015, the first spacecraft to orbit two different bodies beyond the Earth-Moon system."
+        },
+        {
+          "display": "OSIRIS-REx",
+          "match": [
+            "osiris rex",
+            "osiris-rex",
+            "osiris",
+            "bennu",
+            "sample return"
+          ],
+          "rarity": 18,
+          "note": "It grabbed a sample from asteroid Bennu in 2020 and delivered the capsule back to Earth in 2023."
+        },
+        {
+          "display": "Galileo",
+          "match": [
+            "galileo",
+            "gaspra",
+            "ida",
+            "dactyl",
+            "jupiter orbiter"
+          ],
+          "rarity": 28,
+          "note": "On the way to Jupiter it flew past Gaspra in 1991 and Ida in 1993, discovering Ida's tiny moon Dactyl."
+        },
+        {
+          "display": "NEAR Shoemaker",
+          "match": [
+            "near shoemaker",
+            "near",
+            "eros",
+            "mathilde",
+            "asteroid orbiter"
+          ],
+          "rarity": 38,
+          "note": "It orbited Eros for a year and was eventually set down gently on the asteroid's surface in 2001."
+        },
+        {
+          "display": "DART",
+          "match": [
+            "dart",
+            "double asteroid",
+            "dimorphos",
+            "didymos",
+            "kinetic impactor"
+          ],
+          "rarity": 50,
+          "note": "In 2022 it deliberately struck Dimorphos and measurably shortened the little moon's orbit - the first planetary defence test."
+        },
+        {
+          "display": "Deep Space 1",
+          "match": [
+            "deep space 1",
+            "ds1",
+            "braille",
+            "ion engine",
+            "new millennium"
+          ],
+          "rarity": 61,
+          "note": "This ion-engine technology demonstrator flew past asteroid Braille in 1999 before going on to image comet Borrelly."
+        },
+        {
+          "display": "Lucy",
+          "match": [
+            "lucy",
+            "trojan asteroids",
+            "dinkinesh",
+            "jupiter trojans",
+            "lucy mission"
+          ],
+          "rarity": 72,
+          "note": "Launched in 2021 to tour Jupiter's Trojan asteroids, it flew past Dinkinesh in 2023 and found the rock had a satellite."
+        },
+        {
+          "display": "Stardust",
+          "match": [
+            "stardust",
+            "annefrank",
+            "wild 2",
+            "comet dust",
+            "aerogel"
+          ],
+          "rarity": 83,
+          "note": "It photographed asteroid Annefrank in 2002 while on its way to sweep up dust from comet Wild 2."
+        },
+        {
+          "display": "Psyche",
+          "match": [
+            "psyche",
+            "psyche mission",
+            "metal asteroid",
+            "16 psyche",
+            "metal world"
+          ],
+          "rarity": 94,
+          "note": "Launched in October 2023 toward a metal-rich asteroid, it is cruising outward on a solar-electric trajectory."
+        }
+      ],
+      "reveal": "The asteroid belt is almost entirely empty space - NASA probes cross it routinely, and only a handful have ever stopped to look at anything."
+    },
+    {
+      "id": "q16",
+      "zone": 11,
+      "topic": "Kuiper Belt",
+      "prompt": "Name a piece of NASA hardware that has travelled beyond Neptune.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Voyager 1",
+          "match": [
+            "voyager 1",
+            "voyager i",
+            "voyager one",
+            "most distant",
+            "interstellar probe"
+          ],
+          "rarity": 7,
+          "note": "It crossed the heliopause in 2012 and remains the most distant human-made object ever built."
+        },
+        {
+          "display": "Voyager 2",
+          "match": [
+            "voyager 2",
+            "voyager ii",
+            "voyager two",
+            "uranus neptune",
+            "2018 crossing"
+          ],
+          "rarity": 15,
+          "note": "The only spacecraft to have flown past Uranus and Neptune, heading outward since 1989."
+        },
+        {
+          "display": "New Horizons",
+          "match": [
+            "new horizons",
+            "pluto probe",
+            "arrokoth",
+            "kuiper belt probe",
+            "pluto flyby"
+          ],
+          "rarity": 24,
+          "note": "After its 2015 Pluto flyby it continued into the Kuiper Belt and reached Arrokoth on New Year's Day 2019."
+        },
+        {
+          "display": "Pioneer 10",
+          "match": [
+            "pioneer 10",
+            "pioneer x",
+            "pioneer ten",
+            "first jupiter",
+            "last signal 2003"
+          ],
+          "rarity": 34,
+          "note": "Its last faint signal arrived in 2003 from roughly 80 times Earth's distance from the Sun, well past Neptune's orbit."
+        },
+        {
+          "display": "Pioneer 11",
+          "match": [
+            "pioneer 11",
+            "pioneer xi",
+            "pioneer eleven",
+            "first saturn",
+            "1995 silence"
+          ],
+          "rarity": 44,
+          "note": "It fell silent in 1995 while coasting outward after the first flyby of Saturn."
+        },
+        {
+          "display": "Voyager Golden Record",
+          "match": [
+            "golden record",
+            "gold record",
+            "phonograph record",
+            "golden disc",
+            "earth sounds"
+          ],
+          "rarity": 54,
+          "note": "Each Voyager carries an identical gold-plated record of Earth's sounds, greetings and images."
+        },
+        {
+          "display": "LORRI camera",
+          "match": [
+            "lorri",
+            "long range reconnaissance",
+            "reconnaissance imager",
+            "telescopic camera",
+            "pluto camera"
+          ],
+          "rarity": 66,
+          "note": "New Horizons' long-range telescopic imager took the sharpest pictures of Pluto and Arrokoth."
+        },
+        {
+          "display": "Student Dust Counter",
+          "match": [
+            "student dust",
+            "dust counter",
+            "sdc",
+            "venetia",
+            "dust impacts"
+          ],
+          "rarity": 78,
+          "note": "Built and operated by students, it still counts dust grains striking New Horizons as the probe crosses the Kuiper Belt."
+        },
+        {
+          "display": "Ralph imaging spectrometer",
+          "match": [
+            "ralph",
+            "imaging spectrometer",
+            "mvic",
+            "linear etalon",
+            "colour camera"
+          ],
+          "rarity": 88,
+          "note": "New Horizons' visible and infrared mapper revealed the composition and colours of Pluto's surface and Arrokoth."
+        },
+        {
+          "display": "Alice ultraviolet spectrometer",
+          "match": [
+            "alice",
+            "ultraviolet spectrometer",
+            "uv spectrometer",
+            "pluto atmosphere",
+            "airglow"
+          ],
+          "rarity": 96,
+          "note": "New Horizons' UV instrument probed Pluto's escaping atmosphere and searched for rings and faint moons."
+        }
+      ],
+      "reveal": "Only a handful of spacecraft are on trajectories that leave the solar system, and New Horizons is still taking data from inside the Kuiper Belt."
+    },
+    {
+      "id": "q17",
+      "zone": 4,
+      "topic": "Lunar surface",
+      "prompt": "Name a place on the Moon where NASA left hardware behind.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Tranquility Base",
+          "match": [
+            "tranquility base",
+            "tranquillity base",
+            "apollo 11",
+            "sea of tranquility",
+            "statio tranquillitatis"
+          ],
+          "rarity": 7,
+          "note": "Apollo 11's Eagle descent stage, flag, retroreflector and footprints remain in the Sea of Tranquility."
+        },
+        {
+          "display": "Ocean of Storms",
+          "match": [
+            "ocean of storms",
+            "statio cognitum",
+            "apollo 12",
+            "surveyor crater",
+            "oceanus procellarum"
+          ],
+          "rarity": 18,
+          "note": "Apollo 12 landed beside Surveyor 3 here in 1969 and left the first full ALSEP science station."
+        },
+        {
+          "display": "Fra Mauro",
+          "match": [
+            "fra mauro",
+            "apollo 14",
+            "apollo 13 site",
+            "fra mauro highlands",
+            "cone crater"
+          ],
+          "rarity": 30,
+          "note": "The hilly formation originally assigned to Apollo 13; Apollo 14's crew left an ALSEP station and their equipment there."
+        },
+        {
+          "display": "Hadley-Apennine",
+          "match": [
+            "hadley",
+            "hadley apennine",
+            "apollo 15",
+            "hadley rille",
+            "genesis rock"
+          ],
+          "rarity": 42,
+          "note": "The first site to use a Lunar Roving Vehicle - the rover, ALSEP and a laser retroreflector are still parked there."
+        },
+        {
+          "display": "Descartes Highlands",
+          "match": [
+            "descartes",
+            "descartes highlands",
+            "apollo 16",
+            "lunar highlands",
+            "north ray crater"
+          ],
+          "rarity": 54,
+          "note": "The only Apollo landing in the lunar highlands, chosen to sample ancient crust rather than dark mare basalt."
+        },
+        {
+          "display": "Taurus-Littrow",
+          "match": [
+            "taurus littrow",
+            "taurus-littrow",
+            "apollo 17",
+            "final landing",
+            "shorty crater"
+          ],
+          "rarity": 66,
+          "note": "The last Apollo landing in 1972 left a rover, the final ALSEP and the Lunar Ejecta and Meteorites experiment."
+        },
+        {
+          "display": "Cabeus crater",
+          "match": [
+            "cabeus",
+            "cabeus crater",
+            "lcross",
+            "south pole crater",
+            "permanently shadowed"
+          ],
+          "rarity": 78,
+          "note": "LCROSS deliberately slammed a rocket stage into this shadowed south-polar crater in 2009 and confirmed water ice."
+        },
+        {
+          "display": "Tycho highlands",
+          "match": [
+            "tycho",
+            "tycho highlands",
+            "surveyor 7",
+            "tycho rim",
+            "surveyor site"
+          ],
+          "rarity": 88,
+          "note": "Surveyor 7 landed near Tycho's rim in 1968 and still sits there with its camera and digging scoop."
+        },
+        {
+          "display": "Malapert A",
+          "match": [
+            "malapert",
+            "malapert a",
+            "odysseus",
+            "im 1",
+            "clps lander"
+          ],
+          "rarity": 96,
+          "note": "A commercial lander carrying NASA instruments tipped onto its side near this south-polar crater in February 2024."
+        }
+      ],
+      "reveal": "Six Apollo sites plus a scatter of robotic landers and deliberate impactors - Lunar Reconnaissance Orbiter has photographed the hardware and even the astronauts' footprints from orbit."
+    },
+    {
+      "id": "q18",
+      "zone": 7,
+      "topic": "Mars surface",
+      "prompt": "Name a scientific instrument NASA left on the surface of Mars.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "SEIS seismometer",
+          "match": [
+            "seis",
+            "seismometer",
+            "marsquake",
+            "seismic experiment",
+            "insight seismometer"
+          ],
+          "rarity": 9,
+          "note": "InSight's ultra-sensitive seismometer recorded more than 1,300 marsquakes before dust starved the lander of power."
+        },
+        {
+          "display": "HP3 heat-flow probe",
+          "match": [
+            "hp3",
+            "hp 3",
+            "the mole",
+            "heat probe",
+            "heat flow probe"
+          ],
+          "rarity": 20,
+          "note": "InSight's self-hammering 'mole' was meant to burrow five metres but could never find enough friction in Martian soil."
+        },
+        {
+          "display": "MOXIE",
+          "match": [
+            "moxie",
+            "oxygen experiment",
+            "oxygen from co2",
+            "isru",
+            "in situ oxygen"
+          ],
+          "rarity": 31,
+          "note": "Perseverance's toaster-sized experiment made breathable oxygen from the thin carbon-dioxide atmosphere."
+        },
+        {
+          "display": "SuperCam",
+          "match": [
+            "supercam",
+            "super cam",
+            "laser spectrometer",
+            "chemcam",
+            "mast camera laser"
+          ],
+          "rarity": 42,
+          "note": "Perseverance's mast-mounted laser zaps rocks from several metres away to read their chemistry and mineralogy."
+        },
+        {
+          "display": "RIMFAX",
+          "match": [
+            "rimfax",
+            "ground penetrating radar",
+            "radar imager",
+            "subsurface radar",
+            "jezero radar"
+          ],
+          "rarity": 53,
+          "note": "Perseverance's ground-penetrating radar maps layers of sediment and buried rock beneath the rover's wheels."
+        },
+        {
+          "display": "MEDA",
+          "match": [
+            "meda",
+            "weather station",
+            "environmental analyzer",
+            "mars weather",
+            "dust sensor"
+          ],
+          "rarity": 64,
+          "note": "Perseverance's Mars Environmental Dynamics Analyzer logs temperature, wind, dust and humidity at Jezero Crater."
+        },
+        {
+          "display": "RISE",
+          "match": [
+            "rise",
+            "rotation experiment",
+            "interior structure",
+            "radio science",
+            "core wobble"
+          ],
+          "rarity": 75,
+          "note": "InSight's Rotation and Interior Structure Experiment used radio tracking to measure the wobble of Mars's core."
+        },
+        {
+          "display": "Alpha Proton X-Ray Spectrometer",
+          "match": [
+            "apxs",
+            "alpha proton",
+            "x ray spectrometer",
+            "xrs",
+            "elemental spectrometer"
+          ],
+          "rarity": 86,
+          "note": "The arm-mounted APXS on Spirit, Opportunity and Curiosity pressed against rocks to read their elemental make-up."
+        },
+        {
+          "display": "TEGA",
+          "match": [
+            "tega",
+            "thermal evolved gas",
+            "evolved gas analyzer",
+            "phoenix oven",
+            "soil oven"
+          ],
+          "rarity": 95,
+          "note": "Phoenix's Thermal and Evolved Gas Analyzer baked polar soil samples and sniffed the gases they released."
+        }
+      ],
+      "reveal": "A dead Mars lander is not junk - InSight's seismometer rewrote what we know about the planet's core, and its instruments are still bolted to the ground at Elysium Planitia."
+    },
+    {
+      "id": "q19",
+      "zone": 9,
+      "topic": "Jovian system",
+      "prompt": "Name a moon of Jupiter that NASA's Galileo mission studied up close.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Europa",
+          "match": [
+            "europa",
+            "europa moon",
+            "ice shell",
+            "salty ocean",
+            "europa clipper"
+          ],
+          "rarity": 7,
+          "note": "Galileo found strong evidence for a salty liquid ocean beneath Europa's cracked ice shell."
+        },
+        {
+          "display": "Io",
+          "match": [
+            "io",
+            "io moon",
+            "jupiter io",
+            "volcanic moon",
+            "volcanoes"
+          ],
+          "rarity": 17,
+          "note": "Galileo tracked its hundreds of active volcanoes and the sulphur-and-oxygen plasma torus they feed around Jupiter."
+        },
+        {
+          "display": "Ganymede",
+          "match": [
+            "ganymede",
+            "ganymede moon",
+            "largest moon",
+            "magnetic field",
+            "galileo flyby"
+          ],
+          "rarity": 28,
+          "note": "Galileo discovered that Ganymede generates its own magnetic field - the only moon known to do so."
+        },
+        {
+          "display": "Callisto",
+          "match": [
+            "callisto",
+            "callisto moon",
+            "cratered moon",
+            "valhalla",
+            "outer galilean"
+          ],
+          "rarity": 40,
+          "note": "Galileo's repeated flybys revealed one of the most heavily cratered and least geologically active surfaces in the solar system."
+        },
+        {
+          "display": "Amalthea",
+          "match": [
+            "amalthea",
+            "amalthea moon",
+            "inner moon",
+            "2002 flyby",
+            "red moon"
+          ],
+          "rarity": 53,
+          "note": "Galileo passed within about 160 km of this small reddish inner moon in 2002 to pin down its mass and density."
+        },
+        {
+          "display": "Thebe",
+          "match": [
+            "thebe",
+            "thebe moon",
+            "inner satellite",
+            "voyager discovery",
+            "gossamer ring"
+          ],
+          "rarity": 66,
+          "note": "First spotted in Voyager images, this tiny inner moon was imaged again by Galileo and sits inside the gossamer ring region."
+        },
+        {
+          "display": "Metis",
+          "match": [
+            "metis",
+            "metis moon",
+            "innermost moon",
+            "jupiter ring",
+            "small inner moon"
+          ],
+          "rarity": 78,
+          "note": "The innermost known Jovian moon, observed by Galileo as the spacecraft skimmed Jupiter's faint main ring."
+        },
+        {
+          "display": "Adrastea",
+          "match": [
+            "adrastea",
+            "adrastea moon",
+            "ring moon",
+            "tiny moon",
+            "voyager moon"
+          ],
+          "rarity": 89,
+          "note": "Galileo observed this small moon orbiting right at the outer edge of Jupiter's main ring."
+        }
+      ],
+      "reveal": "Galileo was deliberately flown into Jupiter's atmosphere in 2003 so it could never crash into and contaminate Europa's possible ocean."
+    },
+    {
+      "id": "q20",
+      "zone": 5,
+      "topic": "Solar orbit",
+      "prompt": "Name a NASA spacecraft that has flown past a comet.",
+      "time": 25,
+      "answers": [
+        {
+          "display": "Deep Impact",
+          "match": [
+            "deep impact",
+            "tempel 1",
+            "comet impact",
+            "2005 mission",
+            "impactor mission"
+          ],
+          "rarity": 8,
+          "note": "In 2005 it released a projectile into comet Tempel 1 and watched the resulting crater and plume from a safe distance."
+        },
+        {
+          "display": "Stardust",
+          "match": [
+            "stardust",
+            "wild 2",
+            "comet dust",
+            "aerogel",
+            "sample return capsule"
+          ],
+          "rarity": 17,
+          "note": "It swept up particles from comet Wild 2 in 2004 and parachuted the only sample capsule back to Earth in 2006."
+        },
+        {
+          "display": "ISEE-3 / ICE",
+          "match": [
+            "isee 3",
+            "isee-3",
+            "ice probe",
+            "international cometary",
+            "giacobini"
+          ],
+          "rarity": 28,
+          "note": "Repurposed mid-mission and renamed, it flew through comet Giacobini-Zinner's tail in 1985 - the first comet flyby ever."
+        },
+        {
+          "display": "Deep Space 1",
+          "match": [
+            "deep space 1",
+            "ds1",
+            "borrelly",
+            "ion engine",
+            "comet borrelly"
+          ],
+          "rarity": 40,
+          "note": "Its ion engine carried it past comet Borrelly in 2001, returning the best images of a comet nucleus to that date."
+        },
+        {
+          "display": "EPOXI",
+          "match": [
+            "epoxi",
+            "hartley 2",
+            "deep impact extended",
+            "extrasolar planet",
+            "repurposed flyby"
+          ],
+          "rarity": 52,
+          "note": "The renamed Deep Impact flyby spacecraft was sent on to comet Hartley 2 in 2010."
+        },
+        {
+          "display": "Stardust-NExT",
+          "match": [
+            "stardust next",
+            "next mission",
+            "tempel 1 revisit",
+            "stardust extension",
+            "revisit mission"
+          ],
+          "rarity": 64,
+          "note": "The Stardust spacecraft was redirected back to Tempel 1 in 2011 to see how Deep Impact's crater had changed."
+        },
+        {
+          "display": "Deep Impact impactor",
+          "match": [
+            "impactor",
+            "copper projectile",
+            "impact probe",
+            "crater maker",
+            "370 kg"
+          ],
+          "rarity": 75,
+          "note": "A copper-heavy projectile deliberately crashed into Tempel 1 at roughly 10 km per second to expose fresh material."
+        },
+        {
+          "display": "Stardust aerogel collector",
+          "match": [
+            "aerogel",
+            "aerogel collector",
+            "silica aerogel",
+            "dust collector",
+            "tennis racket"
+          ],
+          "rarity": 87,
+          "note": "A racket-shaped array of ultra-light silica gel captured comet grains at high speed without destroying them."
+        },
+        {
+          "display": "Ulysses",
+          "match": [
+            "ulysses",
+            "solar polar",
+            "hyakutake",
+            "comet tail",
+            "mcnaught"
+          ],
+          "rarity": 96,
+          "note": "The ESA-NASA solar probe unexpectedly crossed the long ion tails of comets Hyakutake and McNaught-Hartley far from their nuclei."
+        }
+      ],
+      "reveal": "Comets are leftovers from planet formation, and NASA has crossed their tails with repurposed spacecraft - ISEE-3 was renamed ICE mid-mission just to do it."
+    }
+  ]
+};
