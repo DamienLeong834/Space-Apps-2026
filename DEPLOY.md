@@ -3,6 +3,17 @@
 ## 🌐 Live site
 **https://spaceapps-silent-fleet-2026.netlify.app/**
 
+> **12 Nov 2026 — Age 7-8 Junior upgrade + GitHub:** Junior Explorer mode was
+> rebuilt for younger readers (7-8+): a **tap-to-answer picker** (3 big word
+> buttons under the answer input — typing is now optional), **kid-rewritten
+> questions** ("What did NASA leave on the Moon? 🌙"), **kid zone names**
+> ("Cislunar Space" → "Between Earth and the Moon"), **auto read-aloud** of
+> every question with a stop/toggle, simpler Patch tips/hints, and wider
+> plain-language swaps across comics and fact files. `kid-mode.js` +
+> `kid-mode.css` only — no page files changed. Project is now on GitHub at
+> <https://github.com/DamienLeong834/Space-Apps-2026>.
+
+
 | Page | Path |
 |---|---|
 | Main experience: The Ghost Atlas | `/` |

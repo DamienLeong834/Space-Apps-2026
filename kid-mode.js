@@ -100,7 +100,7 @@ var RELABELS = [
   {s:'.col-cards .sec-head .note',        t:'Tap a card to open its comic'},
   {s:'.console .stamp',                   t:'⭐ YOUR DESK'},
   {s:'.console h3',                       t:'What can you name?'},
-  {s:'.console .sub',                     t:'Type any space machine or tool you know. Every right name earns a star!'},
+  {s:'.console .sub',                     t:'Tap a big answer button below — or type it if you like! Every right name earns a star.'},
   {s:'#beginBtn',                         t:'▶ Start playing!'},
   {s:'#againBtn',                         t:'▶ Play again!'},
   {s:'.patchbag b.pb',                    t:'▮ PATCH\'S WORD BAG'},
@@ -114,7 +114,7 @@ var STAT_LABELS = ['How deep ⬇','Stars ⭐','Places found','Tries left'];
    word-by-word swap, so the sentences still read naturally to an 8-year-old. */
 var HOW_STEPS = [
   '<b>1. Look 👀</b> Tap a glowing dot on the map to read its comic story.',
-  '<b>2. Guess ⌨️</b> Type a name at the Answer Desk. Each right name puts a star-clue on the map!',
+  '<b>2. Answer 👆</b> Tap a big answer button — or type it if you can. Each right name puts a star-clue on the map!',
   '<b>3. Spot the pattern 🔎</b> When clues bunch together, you have found a real space secret.'
 ];
 
@@ -131,15 +131,59 @@ var PHRASES = [
   ['zone','place'],                         ['Zone','Place']
 ];
 var PHRASE_SCOPES = '.mapfoot,.method,.objectives,.steps,.ledger-note,' +
-                    '.quizlet p,.notes li,.console .sub,.sec-head .note,.panhint,footer,.mobilelegend';
+                    '.quizlet p,.notes li,.console .sub,.sec-head .note,.panhint,footer,.mobilelegend,' +
+                    '.cap,.cdialog,.factbox,.factbox p,.drawer .sub,.endnote';
+
+/* ---------- NEW: age 7-8 layer ----------
+   Simple zone names, simple question stems and a tap-to-answer picker,
+   because most 7-8 year olds cannot spell "descent stage" yet. */
+var KID_ZONES = [
+  'Home ground',            /* 0 Surface */
+  'Just above Earth',       /* 1 Low Earth Orbit */
+  'The radiation rings',    /* 2 Van Allen Belts */
+  'Between Earth and the Moon', /* 3 Cislunar Space */
+  'The Moon',               /* 4 Lunar Surface */
+  'Going around the Sun',   /* 5 Solar Orbit */
+  'The road to Mars',       /* 6 Martian Transfer */
+  'Mars',                   /* 7 Martian Surface */
+  'The rocky belt',         /* 8 Asteroid Belt */
+  "Jupiter's neighbourhood",/* 9 Jovian System */
+  "Saturn's neighbourhood", /* 10 Saturnian System */
+  'The icy edge',           /* 11 Kuiper Belt */
+  'Where the Sun\'s wind ends', /* 12 Heliopause */
+  'Deep space'              /* 13 Interstellar Space */
+];
+/* Question stems rewritten as short "what/tell me" questions. Each entry is
+   [regex, replacement] applied to the DISPLAYED question only (#qText). */
+var KID_Q = [
+  [/^Name something NASA left behind on the Moon\.?$/i, 'What did NASA leave on the Moon? 🌙'],
+  [/^Name something NASA left behind (on|in|at) (.+?)\.?$/i, 'What did NASA leave $1 $2?'],
+  [/^Name a piece of NASA hardware (that|which) (.+?)\.?$/i, 'Which NASA machine $2?'],
+  [/^Name a piece of (.+?) hardware\.?$/i, 'What NASA machine is part of $1?'],
+  [/^Name one (.+?)\.?$/i, 'Tell me one $1!'],
+  [/^Give one (.+?)\.?$/i, 'Tell me one $1!'],
+  [/^Name something (.+?)\.?$/i, 'What is something $1?'],
+  [/^Name a (.+?)\.?$/i, 'What is a $1?']
+];
+function kidQuestion(text){
+  var out = String(text).trim(), i;
+  for(i = 0; i < KID_Q.length; i++){
+    if(KID_Q[i][0].test(out)){ out = out.replace(KID_Q[i][0], KID_Q[i][1]); break; }
+  }
+  out = out.split('NASA hardware').join('NASA machine')
+           .split('spacecraft').join('space machine')
+           .split('instrument').join('science tool');
+  return out;
+}
+var kidPicker = null, kidPickerQ = '', kidQSeen = '';
 
 var TIPS = [
-  '👋 Hi! I am <b>Patch</b>, a little robot made from old NASA parts. Tap a glowing dot on the map to read its story.',
-  '⭐ Every right name gives you a star — and gives me a brand new word to keep!',
-  '🗺️ The map shows where each space machine was left. Dots that bunch together tell us a secret.',
-  '💡 Stuck? Tap <b>Give me a hint</b>. Even the best space detectives ask for help.',
-  '📖 Chapter Zero is my comic. It tells how I was built from things people left behind.',
-  '🔎 Look for clues, not just guesses. A clue is a fact you can point to on the map!'
+  '👋 Hi! I am <b>Patch</b>. Tap a glowing dot to read its story!',
+  '⭐ A right answer = 1 star. Stars also give me new words!',
+  '🗺️ The dots show where old machines are floating in space.',
+  '💡 Stuck? Tap <b>Give me a hint</b>. Asking is smart!',
+  '📖 My comic is called Chapter Zero. It tells how I was built!',
+  '🔎 The dots that bunch together hold a space secret!'
 ];
 
 /* ---------- state ---------- */
@@ -167,13 +211,14 @@ function applyText(){
     if(HOW_STEPS[i]) keep(el, HOW_STEPS[i]);
   });
   if(window.__G){
+    var ALL_PHRASES = PHRASES.concat(ZONE_NAMES.map(function(n,i){ return [n, KID_ZONES[i]]; }));
     $$(PHRASE_SCOPES).forEach(function(scope){
       var tw = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, null, false), n, out, orig;
       while((n = tw.nextNode())){
         if(!n.nodeValue || !n.nodeValue.trim()) continue;
         if(n.parentNode && /^(SCRIPT|STYLE|SVG)$/.test(n.parentNode.tagName)) continue;
         orig = n.nodeValue; out = orig;
-        PHRASES.forEach(function(p){ out = out.split(p[0]).join(p[1]); });
+        ALL_PHRASES.forEach(function(p){ out = out.split(p[0]).join(p[1]); });
         if(out !== orig){ if(!savedNodes.has(n)) savedNodes.set(n, orig); n.nodeValue = out; }
       }
     });
@@ -226,8 +271,139 @@ function dynamic(){
     ex.innerHTML = '<b>💪 Not quite!</b> Try another space name — a mission, a robot or a tool. ' +
                    'You can always ask Patch for a hint!';
   }
+  kidQuiz();
 }
+/* ---------- NEW: tap-to-answer picker + spoken question (age 7-8) ---------- */
+var PICK_EMOJI = ['🚀','🛰️','🌙','🪐','☄️','🔭','🌍','⭐','🤖','🧑‍🚀'];
+function kidAutoRead(){ return store.get('ghostAtlasKidAutoRead','on') !== 'off'; }
+function speak(text){
+  if(!('speechSynthesis' in window) || !window.SpeechSynthesisUtterance) return;
+  try{
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(String(text).replace(/[★⭐🚀🛰️🌙🪐☄️🔭🌍🤖🧑‍🚀👆💡📖🔎⭐❤️]/g,''));
+    u.rate = 0.85; u.pitch = 1.15;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function kidActiveQ(){
+  var G = window.__G;
+  if(!G || !G.S || !G.QUESTIONS || !G.QUESTIONS[G.S.qi]) return null;
+  if(!G.S.started || G.S.over || G.S.locked) return null;
+  var inp = byId('qInput');
+  if(!inp || inp.disabled) return null;
+  return G.QUESTIONS[G.S.qi];
+}
+function pickButtons(q){
+  var correct = null, i;
+  var found = window.__G.S.found || [];
+  for(i = 0; i < q.answers.length; i++){
+    if(found.indexOf(q.answers[i].display) === -1){ correct = q.answers[i]; break; }
+  }
+  if(!correct) return null;
+  var pool = (window.__G.POOL || []).map(function(x){ return x.answers[0]; })
+    .concat((window.__G.QUESTIONS || []).map(function(x){ return x.answers[0]; }));
+  var names = q.answers.map(function(a){ return a.display.toLowerCase(); });
+  var bag = [], seen = {};
+  for(i = 0; i < pool.length && bag.length < 12; i++){
+    var a = pool[i];
+    if(!a || !a.display) continue;
+    var d = a.display.toLowerCase();
+    if(seen[d] || names.indexOf(d) > -1) continue;
+    var bad = names.some(function(n){ return d.indexOf(n) > -1 || n.indexOf(d) > -1; });
+    if(bad) continue;
+    seen[d] = 1; bag.push(a.display);
+  }
+  bag.sort(function(){ return Math.random() - 0.5; });
+  var choices = [correct.display].concat(bag.slice(0, 2));
+  choices.sort(function(){ return Math.random() - 0.5; });
+  return { correct: correct, choices: choices };
+}
+function kidQuiz(){
+  var G = window.__G;
+  var qtext = byId('qText'), qtopic = byId('qTopic');
+  /* displayed question + topic line get the simple reading-level rewrite */
+  if(qtext && qtext.textContent.trim() && qtext.textContent !== '—'){
+    var simple = kidQuestion(qtext.textContent);
+    if(simple !== qtext.textContent){
+      if(!savedHTML.has(qtext)) savedHTML.set(qtext, qtext.innerHTML);
+      qtext.innerHTML = esc(simple);
+    }
+    if(qtopic){
+      var t = qtopic.textContent, t2 = t, zi;
+      for(zi = 0; zi < ZONE_NAMES.length && window.__G && window.__G.ZONES; zi++){
+        t2 = t2.split(window.__G.ZONES[zi].t).join(KID_ZONES[zi]);
+      }
+      t2 = t2.replace(/^Topic · /, 'Where? ').replace(/ · zone /, ' · place ');
+      if(t2 !== t && !savedHTML.has(qtopic)) savedHTML.set(qtopic, qtopic.innerHTML);
+      if(t2 !== t) qtopic.textContent = t2;
+    }
+  }
+  /* the picker itself (atlas only — page 05 does not expose submitAnswer) */
+  if(!G || !byId('beginBtn')) return;
+  var consoleEl = $('.console');
+  if(!consoleEl) return;
+  if(!kidPicker){
+    kidPicker = document.createElement('div');
+    kidPicker.className = 'kidpick';
+    kidPicker.id = 'kidPick';
+    kidPicker.innerHTML = '<div class="kidpick-h">👆 Too hard to type? Tap an answer!</div>'
+      + '<div class="kidpick-btns" id="kidPickBtns"></div>'
+      + '<div class="kidpick-foot">'
+      + '<button type="button" class="kidpickread" id="kidPickRead">🔊 Read the question</button>'
+      + '<button type="button" class="kidpickread" id="kidPickAuto">🔇 Auto-read: ON</button>'
+      + '</div>';
+    var timerEl = consoleEl.querySelector('.timer');
+    if(timerEl) consoleEl.insertBefore(kidPicker, timerEl);
+    else consoleEl.appendChild(kidPicker);
+    byId('kidPickBtns').addEventListener('click', function(e){
+      var b = e.target.closest('button.kidchoice');
+      if(!b) return;
+      var inp = byId('qInput');
+      if(!inp || inp.disabled) return;
+      inp.value = b.getAttribute('data-v');
+      if(G.submitAnswer){ G.submitAnswer(); }
+      setTimeout(kidQuiz, 60);
+    });
+    byId('kidPickRead').addEventListener('click', function(){
+      var t = byId('qText');
+      if(window.speechSynthesis && window.speechSynthesis.speaking){
+        window.speechSynthesis.cancel(); toast('🔇 Stopped reading.'); return;
+      }
+      if(t) speak(t.textContent);
+    });
+    byId('kidPickAuto').addEventListener('click', function(){
+      var v = kidAutoRead();
+      store.set('ghostAtlasKidAutoRead', v ? 'off' : 'on');
+      this.textContent = v ? '🔊 Auto-read: OFF' : '🔇 Auto-read: ON';
+      if(!v){ var t = byId('qText'); if(t) speak(t.textContent); }
+    });
+  }
+  var q = kidActiveQ(), btnsEl = byId('kidPickBtns');
+  if(!q || !btnsEl){ kidPicker.style.display = 'none'; return; }
+  var picked = pickButtons(q);
+  if(!picked){ kidPicker.style.display = 'none'; return; }
+  kidPicker.style.display = '';
+  var sig = q.id + '|' + picked.choices.join('|');
+  if(sig !== kidPickerQ){
+    kidPickerQ = sig;
+    var html = '', i, em;
+    for(i = 0; i < picked.choices.length; i++){
+      em = PICK_EMOJI[(q.id.length + i * 3) % PICK_EMOJI.length];
+      html += '<button type="button" class="kidchoice" data-v="' + esc(picked.choices[i]) + '">'
+            + '<span class="kce">' + em + '</span>' + esc(picked.choices[i]) + '</button>';
+    }
+    btnsEl.innerHTML = html;
+    byId('kidPickAuto').textContent = kidAutoRead() ? '🔇 Auto-read: ON' : '🔊 Auto-read: OFF';
+    if(kidAutoRead()) speak(kidQuestion(q.prompt || (byId('qText') || {}).textContent || ''));
+  }
+}
+var ZONE_NAMES = ['Surface','Low Earth Orbit','Van Allen Belts','Cislunar Space','Lunar Surface',
+  'Solar Orbit','Martian Transfer','Martian Surface','Asteroid Belt','Jovian System',
+  'Saturnian System','Kuiper Belt','Heliopause','Interstellar Space'];
+
 function unpolish(){
+  if(kidPicker){ kidPicker.style.display = 'none'; kidPickerQ = ''; }
+  if('speechSynthesis' in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
   var e = byId('qNum');
   if(e) e.textContent = e.textContent.replace(/^Question /, 'Prompt ');
   e = byId('qTopic');
@@ -318,8 +494,11 @@ function hint(){
     return;
   }
   hintLevel = Math.min(3, hintLevel + 1);
+  var zKidName = c.zone.t;
+  var zi = ZONE_NAMES.indexOf(c.zone.t);
+  if(zi > -1) zKidName = KID_ZONES[zi];
   if(hintLevel === 1){
-    say('🔎 We are looking near <b>' + esc(c.zone.t) + '</b>. The topic is <b>' + esc(c.q.topic)
+    say('🔎 We are looking near <b>' + esc(zKidName) + '</b>. The topic is <b>' + esc(c.q.topic)
       + '</b>. Read the question out loud, then try any name you know!');
   } else if(hintLevel === 2){
     var letters = [];
@@ -367,7 +546,7 @@ function makeIntro(){
     + '<p>I am a little robot built from old NASA parts. Let\'s be space detectives together! '
     + 'Old machines are still out there in space, and every one has a story.</p>'
     + '<ol><li>👆 Tap a glowing dot to read its comic</li>'
-    + '<li>⌨️ Type a name you think fits</li>'
+    + '<li>👆 Tap a big answer button below the question</li>'
     + '<li>⭐ Get a star and teach me a new word</li></ol>'
     + '</div>';
   wrap.insertBefore(d, wrap.firstElementChild);
