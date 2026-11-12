@@ -1,7 +1,23 @@
 # Deployment notes — Space Apps 2026 concept templates
 
 ## 🌐 Live site
-**https://spaceapps-silent-fleet-2026.netlify.app/**
+**https://silent-fleet-2026.netlify.app/** — deployed 12 Nov 2026 to the
+**new Netlify account** (mrpoopypantstoo@gmail.com, site id
+`a2517329-f9b9-4154-b5da-3b6d865972b5`).
+
+- The old site `spaceapps-silent-fleet-2026.netlify.app` still exists on the
+  **old** Netlify account and may remain as an alias; all new deploys go to
+  **silent-fleet-2026**.
+- New-account quirks fixed: `sso_login` had to be set to **false** at site
+  level again (new accounts default it on — visitors got HTTP 401 until
+  changed). The Netlify badge **cannot** be removed on this plan (HTTP 422),
+  so it stays.
+- Zip deploys via the API: `POST /api/v1/sites/{id}/deploys` with
+  `Content-Type: application/zip` and the zip as the request body. A
+  multipart `-F "file=@site.zip"` upload is accepted but **stays stuck in
+  `state: new` forever** — use the raw zip body.
+- All routes verified 200 on the new URL; private files still 404;
+  `/kid-mode.js` byte-identical (SHA256 match) to the local publish copy.
 
 > **12 Nov 2026 — Age 7-8 Junior upgrade + GitHub:** Junior Explorer mode was
 > rebuilt for younger readers (7-8+): a **tap-to-answer picker** (3 big word

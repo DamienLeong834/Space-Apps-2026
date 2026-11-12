@@ -2,7 +2,7 @@
 
 > **NASA Space Apps 2026** · Challenge track: *Abandoned but not Forgotten*
 >
-> 🌐 **Live site:** <https://spaceapps-silent-fleet-2026.netlify.app/>
+> 🌐 **Live site:** <https://silent-fleet-2026.netlify.app/>
 
 An interactive, story-driven evidence map of **real NASA hardware abandoned in space** — from Apollo descent stages on the Moon to Voyager crossing into interstellar space. Plot what you learn where the machines were left, read their stories as comic case files, and follow the pattern until the case closes.
 
@@ -92,7 +92,7 @@ python -m http.server 8747 --bind 127.0.0.1
 
 ## 🌐 Deployment
 
-Static hosting on **Netlify** (`spaceapps-silent-fleet-2026.netlify.app`). Full deploy procedure, settings and post-deploy verification checklists live in **[DEPLOY.md](DEPLOY.md)**.
+Static hosting on **Netlify** (`silent-fleet-2026.netlify.app`). Full deploy procedure, settings and post-deploy verification checklists live in **[DEPLOY.md](DEPLOY.md)**.
 
 ## 👥 Team
 
